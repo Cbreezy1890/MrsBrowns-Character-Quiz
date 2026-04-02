@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Who Is Your Character?</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --paper: #faf7f2;
+    --accent: #c0392b;
+    --gold: #d4a843;
+    --muted: #7a7068;
+    --card: #ffffff;
+    --border: #e8e0d4;
+    --progress-bg: #e8e0d4;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background-color: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 10% 20%, rgba(192,57,43,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 90% 80%, rgba(212,168,67,0.08) 0%, transparent 50%);
+  }
+
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* HEADER */
+  .quiz-header {
+    text-align: center;
+    margin-bottom: 48px;
+    animation: fadeDown 0.7s ease both;
+  }
+
+  .quiz-header .eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .quiz-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 14px;
+  }
+
+  .quiz-header p {
+    font-size: 15px;
+    color: var(--muted);
+    font-weight: 300;
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 24px auto;
+    max-width: 200px;
+  }
+  .divider span { flex: 1; height: 1px; background: var(--gold); opacity: 0.5; }
+  .divider i { color: var(--gold); font-size: 12px; font-style: normal; }
+
+  /* PROGRESS */
+  .progress-bar-wrap {
+    margin-bottom: 36px;
+    animation: fadeDown 0.7s 0.1s ease both;
+  }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+  .progress-bar {
+    height: 4px;
+    background: var(--progress-bg);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--gold));
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* NAME FIELD */
+  .name-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 20px;
+    animation: fadeUp 0.5s ease both;
+    box-shadow: 0 2px 20px rgba(26,26,46,0.04);
+  }
+
+  /* QUESTION CARD */
+  .question-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 20px;
+    display: none;
+    animation: fadeUp 0.45s ease both;
+    box-shadow: 0 2px 20px rgba(26,26,46,0.04);
+  }
+  .question-card.active { display: block; }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .question-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--ink);
+    margin-bottom: 24px;
+  }
+
+  /* MULTIPLE CHOICE */
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+
+  .choice-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: transparent;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--ink);
+    text-align: left;
+    transition: all 0.2s ease;
+    line-height: 1.5;
+  }
+
+  .choice-btn:hover {
+    border-color: var(--accent);
+    background: rgba(192,57,43,0.04);
+    transform: translateX(3px);
+  }
+
+  .choice-btn.selected {
+    border-color: var(--accent);
+    background: rgba(192,57,43,0.07);
+    font-weight: 500;
+  }
+
+  .choice-letter {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+
+  .choice-btn.selected .choice-letter {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  /* THIS OR THAT */
+  .thisthat {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .thisthat .choice-btn {
+    justify-content: center;
+    text-align: center;
+    padding: 20px 14px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .thisthat-or {
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--muted);
+    font-size: 13px;
+    margin: 2px 0;
+    grid-column: 1 / -1;
+    display: none;
+  }
+
+  /* SCALE */
+  .scale-wrap { padding: 8px 0; }
+
+  .scale-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .scale-track {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+
+  .scale-pip {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--muted);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .scale-pip:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    transform: translateY(-2px);
+  }
+
+  .scale-pip.selected {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(212,168,67,0.35);
+  }
+
+  /* TRAIT PICKER */
+  .traits-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+  }
+
+  .trait-chip {
+    padding: 8px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    background: transparent;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--ink);
+    transition: all 0.18s ease;
+  }
+
+  .trait-chip:hover {
+    border-color: var(--ink);
+    background: rgba(26,26,46,0.04);
+  }
+
+  .trait-chip.selected {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: white;
+    font-weight: 500;
+  }
+
+  /* STUDENT NAME INPUT */
+  .input-group { margin-bottom: 20px; }
+  .input-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .input-group input {
+    width: 100%;
+    padding: 13px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--ink);
+    background: var(--paper);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .input-group input:focus { border-color: var(--accent); }
+
+  /* NAV BUTTONS */
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 28px;
+    gap: 12px;
+  }
+
+  .btn {
+    padding: 13px 28px;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    letter-spacing: 0.02em;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+    box-shadow: 0 4px 14px rgba(192,57,43,0.25);
+  }
+  .btn-primary:hover {
+    background: #a93226;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(192,57,43,0.35);
+  }
+  .btn-primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1.5px solid var(--border);
+  }
+  .btn-ghost:hover {
+    border-color: var(--muted);
+    color: var(--ink);
+  }
+
+  .btn-submit {
+    background: linear-gradient(135deg, var(--ink), #2c2c54);
+    color: white;
+    width: 100%;
+    padding: 16px;
+    font-size: 15px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(26,26,46,0.2);
+    margin-top: 28px;
+  }
+  .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(26,26,46,0.3);
+  }
+
+  /* RESULT */
+  #result-section {
+    display: none;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .result-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 48px 36px;
+    text-align: center;
+    box-shadow: 0 4px 40px rgba(26,26,46,0.08);
+  }
+
+  .result-eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .result-type {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .result-subtitle {
+    font-family: 'DM Sans', sans-serif;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--gold);
+    letter-spacing: 0.04em;
+    margin-bottom: 28px;
+  }
+
+  .result-divider {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--gold));
+    margin: 0 auto 28px;
+    border-radius: 1px;
+  }
+
+  .result-summary {
+    font-size: 15px;
+    line-height: 1.85;
+    color: var(--ink);
+    text-align: left;
+    margin-bottom: 28px;
+  }
+
+  .result-traits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 32px;
+  }
+
+  .result-trait-chip {
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: var(--paper);
+    border: 1.5px solid var(--border);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .result-trait-chip.highlight {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: white;
+  }
+
+  .result-reflection {
+    background: var(--paper);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 10px 10px 0;
+    padding: 18px 20px;
+    text-align: left;
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+
+  .result-reflection strong {
+    color: var(--ink);
+    display: block;
+    margin-bottom: 4px;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .btn-retake {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--muted);
+    font-size: 13px;
+    padding: 11px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+  .btn-retake:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* ANIMATIONS */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* MOBILE */
+  @media (max-width: 480px) {
+    .container { padding: 28px 16px 60px; }
+    .question-card, .name-section { padding: 24px 20px; }
+    .scale-pip { width: 42px; height: 42px; }
+    .thisthat { grid-template-columns: 1fr; }
+    .result-card { padding: 36px 24px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="quiz-header">
+    <p class="eyebrow">Character Study</p>
+    <h1>Who Is Your Character?</h1>
+    <div class="divider"><span></span><i>✦</i><span></span></div>
+    <p>Answer every question as your character — not yourself. Think about how <em>they</em> would react, what <em>they</em> want, and who <em>they</em> really are.</p>
+  </header>
+
+  <div class="progress-bar-wrap">
+    <div class="progress-meta">
+      <span id="progress-label">Question 1 of 11</span>
+      <span id="progress-pct">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+
+  <!-- NAME CARD -->
+  <div class="question-card active" id="card-0">
+    <div class="section-label">Let's begin</div>
+    <p class="question-text">First, tell us a little about who we're working with.</p>
+    <div class="input-group">
+      <label>Your Name (Student)</label>
+      <input type="text" id="student-name" placeholder="Your first and last name" />
+    </div>
+    <div class="input-group">
+      <label>Your Character's Name</label>
+      <input type="text" id="char-name" placeholder="What is your character called?" />
+    </div>
+    <div class="nav-row">
+      <span></span>
+      <button class="btn btn-primary" onclick="nextCard(0)">Begin the Quiz →</button>
+    </div>
+  </div>
+
+  <!-- Q1 -->
+  <div class="question-card" id="card-1">
+    <div class="section-label">Section 1 · Multiple Choice</div>
+    <p class="question-text">Your character just found out someone close to them has been keeping a major secret. What's their first reaction?</p>
+    <div class="choices" id="q1">
+      <button class="choice-btn" onclick="selectChoice('q1',0,'leader')" data-type="leader">
+        <span class="choice-letter">A</span> Confront them immediately — they need answers right now.
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',1,'loner')" data-type="loner">
+        <span class="choice-letter">B</span> Pull away and process it alone before saying a word.
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',2,'empath')" data-type="empath">
+        <span class="choice-letter">C</span> Try to understand the other person's reasons before reacting.
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',3,'strategist')" data-type="strategist">
+        <span class="choice-letter">D</span> Make a plan. Figure out how this changes everything.
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(1)">← Back</button>
+      <button class="btn btn-primary" id="next-1" onclick="nextCard(1)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="question-card" id="card-2">
+    <div class="section-label">Section 1 · Multiple Choice</div>
+    <p class="question-text">When everything goes wrong at once, your character tends to…</p>
+    <div class="choices" id="q2">
+      <button class="choice-btn" onclick="selectChoice('q2',0,'leader')" data-type="leader">
+        <span class="choice-letter">A</span> Take charge and start fixing things immediately.
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',1,'loner')" data-type="loner">
+        <span class="choice-letter">B</span> Shut down or go quiet until the storm passes.
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',2,'empath')" data-type="empath">
+        <span class="choice-letter">C</span> Lean on someone they trust for support.
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',3,'strategist')" data-type="strategist">
+        <span class="choice-letter">D</span> Channel it into something — anger, humor, creativity.
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(2)">← Back</button>
+      <button class="btn btn-primary" id="next-2" onclick="nextCard(2)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="question-card" id="card-3">
+    <div class="section-label">Section 1 · Multiple Choice</div>
+    <p class="question-text">What does your character want most, even if they never say it out loud?</p>
+    <div class="choices" id="q3">
+      <button class="choice-btn" onclick="selectChoice('q3',0,'leader')" data-type="leader">
+        <span class="choice-letter">A</span> To be respected and taken seriously.
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',1,'loner')" data-type="loner">
+        <span class="choice-letter">B</span> To belong somewhere — or to someone.
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',2,'empath')" data-type="empath">
+        <span class="choice-letter">C</span> To prove something to themselves.
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',3,'strategist')" data-type="strategist">
+        <span class="choice-letter">D</span> To finally feel safe.
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(3)">← Back</button>
+      <button class="btn btn-primary" id="next-3" onclick="nextCard(3)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q4 This or That -->
+  <div class="question-card" id="card-4">
+    <div class="section-label">Section 2 · This or That</div>
+    <p class="question-text">Which fits your character better?</p>
+    <div class="choices thisthat" id="q4">
+      <button class="choice-btn" onclick="selectChoice('q4',0,'leader')" data-type="leader">
+        Speaks before they think
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',1,'strategist')" data-type="strategist">
+        Thinks before they speak
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(4)">← Back</button>
+      <button class="btn btn-primary" id="next-4" onclick="nextCard(4)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q5 This or That -->
+  <div class="question-card" id="card-5">
+    <div class="section-label">Section 2 · This or That</div>
+    <p class="question-text">Which fits your character better?</p>
+    <div class="choices thisthat" id="q5">
+      <button class="choice-btn" onclick="selectChoice('q5',0,'empath')" data-type="empath">
+        Forgives quickly, forgets slowly
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',1,'loner')" data-type="loner">
+        Forgives slowly, never really forgets
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(5)">← Back</button>
+      <button class="btn btn-primary" id="next-5" onclick="nextCard(5)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q6 This or That -->
+  <div class="question-card" id="card-6">
+    <div class="section-label">Section 2 · This or That</div>
+    <p class="question-text">Which fits your character better?</p>
+    <div class="choices thisthat" id="q6">
+      <button class="choice-btn" onclick="selectChoice('q6',0,'empath')" data-type="empath">
+        Would rather be liked
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',1,'strategist')" data-type="strategist">
+        Would rather be feared
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(6)">← Back</button>
+      <button class="btn btn-primary" id="next-6" onclick="nextCard(6)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q7 Scale -->
+  <div class="question-card" id="card-7">
+    <div class="section-label">Section 3 · Scale</div>
+    <p class="question-text">How brave is your character? They face fear when it matters.</p>
+    <div class="scale-wrap">
+      <div class="scale-labels"><span>Not brave at all</span><span>Very brave</span></div>
+      <div class="scale-track" id="q7">
+        <button class="scale-pip" onclick="selectScale('q7',1)">1</button>
+        <button class="scale-pip" onclick="selectScale('q7',2)">2</button>
+        <button class="scale-pip" onclick="selectScale('q7',3)">3</button>
+        <button class="scale-pip" onclick="selectScale('q7',4)">4</button>
+        <button class="scale-pip" onclick="selectScale('q7',5)">5</button>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(7)">← Back</button>
+      <button class="btn btn-primary" id="next-7" onclick="nextCard(7)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q8 Scale -->
+  <div class="question-card" id="card-8">
+    <div class="section-label">Section 3 · Scale</div>
+    <p class="question-text">How trustworthy is your character? Others can count on them to keep their word.</p>
+    <div class="scale-wrap">
+      <div class="scale-labels"><span>Not reliable</span><span>Highly reliable</span></div>
+      <div class="scale-track" id="q8">
+        <button class="scale-pip" onclick="selectScale('q8',1)">1</button>
+        <button class="scale-pip" onclick="selectScale('q8',2)">2</button>
+        <button class="scale-pip" onclick="selectScale('q8',3)">3</button>
+        <button class="scale-pip" onclick="selectScale('q8',4)">4</button>
+        <button class="scale-pip" onclick="selectScale('q8',5)">5</button>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(8)">← Back</button>
+      <button class="btn btn-primary" id="next-8" onclick="nextCard(8)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q9 Scale -->
+  <div class="question-card" id="card-9">
+    <div class="section-label">Section 3 · Scale</div>
+    <p class="question-text">How self-aware is your character? They understand their own flaws and what drives them.</p>
+    <div class="scale-wrap">
+      <div class="scale-labels"><span>Unaware</span><span>Very self-aware</span></div>
+      <div class="scale-track" id="q9">
+        <button class="scale-pip" onclick="selectScale('q9',1)">1</button>
+        <button class="scale-pip" onclick="selectScale('q9',2)">2</button>
+        <button class="scale-pip" onclick="selectScale('q9',3)">3</button>
+        <button class="scale-pip" onclick="selectScale('q9',4)">4</button>
+        <button class="scale-pip" onclick="selectScale('q9',5)">5</button>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(9)">← Back</button>
+      <button class="btn btn-primary" id="next-9" onclick="nextCard(9)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q10 Traits -->
+  <div class="question-card" id="card-10">
+    <div class="section-label">Section 4 · Trait Picker</div>
+    <p class="question-text">Select every trait that fits your character. Choose as many as feel true.</p>
+    <div class="traits-wrap" id="q10">
+      <button class="trait-chip" onclick="toggleTrait(this)">Loyal</button>
+      <button class="trait-chip" onclick="toggleTrait(this)">Stubborn</button>
+      <button class="trait-chip" onclick="toggleTrait(this)">Curious</button>
+      <button class="trait-chip" onclick="toggleTrait(this)">Hot-headed</button>
+      <button class="trait-chip" onclick="toggleTrait(this)">Compassionate</button>
+      <button class="trait-chip" onclick="toggleTrait(this)">Secretive</button>
+      <button class="trait-chip" onclick="toggleTrait(this)">Ambitious</button>
+      <button class="trait-chip" onclick="toggleTrait(this)">Insecure</button>
+      <button class="trait-chip" onclick="toggleTrait(this)">Sarcastic</button>
+      <button class="trait-chip" onclick="toggleTrait(this)">Protective</button>
+      <button class="trait-chip" onclick="toggleTrait(this)">Reckless</button>
+      <button class="trait-chip" onclick="toggleTrait(this)">Kind</button>
+      <button class="trait-chip" onclick="toggleTrait(this)">Calculating</button>
+      <button class="trait-chip" onclick="toggleTrait(this)">Courageous</button>
+      <button class="trait-chip" onclick="toggleTrait(this)">Guarded</button>
+      <button class="trait-chip" onclick="toggleTrait(this)">Funny</button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(10)">← Back</button>
+      <button class="btn btn-primary" id="next-10" onclick="nextCard(10)">Next →</button>
+    </div>
+  </div>
+
+  <!-- Q11 Reflection -->
+  <div class="question-card" id="card-11">
+    <div class="section-label">Final Question</div>
+    <p class="question-text">In 2–3 sentences, describe your character in your own words.</p>
+    <div class="input-group">
+      <label>Your answer</label>
+      <textarea id="reflection" rows="5" style="width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);background:var(--paper);outline:none;resize:vertical;transition:border-color 0.2s;line-height:1.6;" placeholder="What makes your character who they are?" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(11)">← Back</button>
+      <span></span>
+    </div>
+    <button class="btn btn-submit" onclick="generateResult()">✦ Reveal My Character →</button>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-section">
+    <div class="result-card">
+      <p class="result-eyebrow" id="res-student-label"></p>
+      <h2 class="result-type" id="res-type"></h2>
+      <p class="result-subtitle" id="res-subtitle"></p>
+      <div class="result-divider"></div>
+      <p class="result-summary" id="res-summary"></p>
+      <div class="result-traits" id="res-traits"></div>
+      <div class="result-reflection">
+        <strong>📖 Keep this in mind as you write</strong>
+        <span id="res-writing-tip"></span>
+      </div>
+      <button class="btn-retake" onclick="retake()">↩ Start Over</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────────────────────────
+const TOTAL_CARDS = 11; // cards 1–11
+const scores = { leader: 0, loner: 0, empath: 0, strategist: 0 };
+const scaleAnswers = {};
+const answers = {};
+
+// ─── NAVIGATION ──────────────────────────────────────────────────────────────
+function showCard(n) {
+  document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
+  document.getElementById('card-' + n).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  updateProgress(n);
+}
+
+function nextCard(current) {
+  if (current === 0) {
+    // name validation
+    const sn = document.getElementById('student-name').value.trim();
+    const cn = document.getElementById('char-name').value.trim();
+    if (!sn || !cn) { alert('Please fill in both names before continuing.'); return; }
+  }
+  showCard(current + 1);
+}
+
+function prevCard(current) { showCard(current - 1); }
+
+function updateProgress(cardIndex) {
+  const pct = cardIndex === 0 ? 0 : Math.round((cardIndex / TOTAL_CARDS) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
+  if (cardIndex === 0) {
+    document.getElementById('progress-label').textContent = 'Let\'s get started';
+  } else {
+    document.getElementById('progress-label').textContent = 'Question ' + cardIndex + ' of ' + TOTAL_CARDS;
+  }
+}
+
+// ─── MULTIPLE CHOICE & THIS/THAT ─────────────────────────────────────────────
+function selectChoice(qId, idx, type) {
+  const container = document.getElementById(qId);
+  container.querySelectorAll('.choice-btn').forEach((btn, i) => {
+    btn.classList.toggle('selected', i === idx);
+    const letter = btn.querySelector('.choice-letter');
+    if (letter) letter.style.background = i === idx ? 'var(--accent)' : '';
+  });
+  answers[qId] = { idx, type };
+  const cardNum = parseInt(qId.replace('q', ''));
+  const nextBtn = document.getElementById('next-' + cardNum);
+  if (nextBtn) nextBtn.disabled = false;
+}
+
+// ─── SCALE ───────────────────────────────────────────────────────────────────
+function selectScale(qId, value) {
+  const container = document.getElementById(qId);
+  container.querySelectorAll('.scale-pip').forEach((pip, i) => {
+    pip.classList.toggle('selected', i + 1 === value);
+  });
+  scaleAnswers[qId] = value;
+  const cardNum = parseInt(qId.replace('q', ''));
+  const nextBtn = document.getElementById('next-' + cardNum);
+  if (nextBtn) nextBtn.disabled = false;
+}
+
+// ─── TRAIT PICKER ────────────────────────────────────────────────────────────
+function toggleTrait(el) { el.classList.toggle('selected'); }
+
+function getSelectedTraits() {
+  return [...document.querySelectorAll('#q10 .trait-chip.selected')].map(el => el.textContent);
+}
+
+// ─── SCORING ─────────────────────────────────────────────────────────────────
+function calcScores() {
+  // Reset
+  Object.keys(scores).forEach(k => scores[k] = 0);
+
+  // Multiple choice & this/that (q1–q6)
+  ['q1','q2','q3','q4','q5','q6'].forEach(q => {
+    if (answers[q]) scores[answers[q].type] += 2;
+  });
+
+  // Scales: map to types
+  // q7 bravery → leader if high, loner if low
+  const bravery = scaleAnswers['q7'] || 3;
+  if (bravery >= 4) scores.leader += (bravery - 3);
+  else if (bravery <= 2) scores.loner += (3 - bravery);
+
+  // q8 trustworthy → empath if high, strategist if low
+  const trust = scaleAnswers['q8'] || 3;
+  if (trust >= 4) scores.empath += (trust - 3);
+  else if (trust <= 2) scores.strategist += (3 - trust);
+
+  // q9 self-aware → strategist if high, leader if low (overconfident)
+  const aware = scaleAnswers['q9'] || 3;
+  if (aware >= 4) scores.strategist += (aware - 3);
+  else if (aware <= 2) scores.leader += 1; // brash, unaware
+
+  // Trait bonuses
+  const traits = getSelectedTraits();
+  const traitMap = {
+    leader:     ['Hot-headed','Ambitious','Brave','Protective','Reckless'],
+    loner:      ['Stubborn','Secretive','Guarded','Insecure'],
+    empath:     ['Loyal','Compassionate','Kind','Funny'],
+    strategist: ['Calculating','Curious','Sarcastic','Ambitious']
+  };
+  traits.forEach(t => {
+    Object.entries(traitMap).forEach(([type, list]) => {
+      if (list.includes(t)) scores[type] += 1;
+    });
+  });
+}
+
+function getDominantType() {
+  return Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0];
+}
+
+// ─── RESULT PROFILES ─────────────────────────────────────────────────────────
+const profiles = {
+  leader: {
+    type: 'The Frontrunner',
+    subtitle: 'Bold. Decisive. Always moving.',
+    summary: (name, brave, trust, aware, traits) => {
+      const traitStr = traits.length > 0 ? ` You chose words like <strong>${traits.slice(0,4).join(', ')}</strong> — and those paint a clear picture.` : '';
+      const braveNote = brave >= 4 ? 'Your character charges toward danger rather than away from it.' : 'They pick their battles, but when they commit, they commit completely.';
+      const trustNote = trust >= 4 ? 'People around them know they can be counted on when it really matters.' : 'They can be unpredictable — loyalty has limits for them.';
+      const awareNote = aware >= 4 ? 'And what sets them apart from a typical hero is that they actually know their flaws.' : 'They sometimes act before they think — which is both their greatest strength and their biggest liability.';
+      return `${name} is the kind of character who walks into a room and changes the energy. They don't wait for someone else to take charge — they just do it, and usually everyone follows.${traitStr} ${braveNote} ${trustNote} ${awareNote} This character will shine in moments of crisis, but their real story lives in the quieter scenes — where they have to deal with the cost of always being the one who leads.`;
+    },
+    tip: 'When your character faces a decision, ask: are they leading because they want to help — or because they can\'t stand not being in control? That tension is where great writing lives.'
+  },
+  loner: {
+    type: 'The Lone Wolf',
+    subtitle: 'Quiet. Complex. Hard to reach.',
+    summary: (name, brave, trust, aware, traits) => {
+      const traitStr = traits.length > 0 ? ` Traits like <strong>${traits.slice(0,4).join(', ')}</strong> fill in the edges of who they are.` : '';
+      const braveNote = brave >= 4 ? 'They are braver than they look — they just don\'t announce it.' : 'They\'re careful. They don\'t take risks they haven\'t thought through.';
+      const trustNote = trust >= 4 ? 'And when they do let someone in, that loyalty runs bone-deep.' : 'Trust is something they give out slowly and take back fast.';
+      const awareNote = aware >= 4 ? 'They have a sharp understanding of who they are — even the parts they don\'t like.' : 'Part of their journey will be learning to see themselves more clearly.';
+      return `${name} doesn\'t need a crowd. They move through the story on their own terms, keeping their thoughts close and their past closer.${traitStr} ${braveNote} ${trustNote} ${awareNote} The most interesting version of this character is the one who eventually lets someone through the wall — and what happens after that.`;
+    },
+    tip: 'Your character probably has a wound they haven\'t told anyone about. Figure out what it is. You don\'t have to put it in the story directly — but knowing it will make every scene feel real.'
+  },
+  empath: {
+    type: 'The Heart of the Story',
+    subtitle: 'Warm. Perceptive. Quietly powerful.',
+    summary: (name, brave, trust, aware, traits) => {
+      const traitStr = traits.length > 0 ? ` Words like <strong>${traits.slice(0,4).join(', ')}</strong> describe them well.` : '';
+      const braveNote = brave >= 4 ? 'They are braver than most people realize — especially when someone they love is at stake.' : 'They pick their moments, but emotional courage is something they have in abundance.';
+      const trustNote = trust >= 4 ? 'People trust them instinctively, and they\'ve earned it.' : 'They want to be trustworthy, but sometimes their own feelings get in the way.';
+      const awareNote = aware >= 4 ? 'They read people well and they read themselves just as clearly.' : 'Their blind spot tends to be themselves — they\'re better at understanding others than understanding what they need.';
+      return `${name} is the character other characters talk to when everything falls apart — and somehow, they always have the right thing to say.${traitStr} ${braveNote} ${trustNote} ${awareNote} Their power isn't loud. It\'s the kind that holds a group together without anyone quite realizing it. Their story gets interesting when they stop putting everyone else first.`;
+    },
+    tip: 'Give your character something they want just for themselves — something they haven\'t told anyone. That selfish little secret will make them feel three-dimensional.'
+  },
+  strategist: {
+    type: 'The Shadow Player',
+    subtitle: 'Calculated. Perceptive. Three steps ahead.',
+    summary: (name, brave, trust, aware, traits) => {
+      const traitStr = traits.length > 0 ? ` Traits like <strong>${traits.slice(0,4).join(', ')}</strong> are right on brand for them.` : '';
+      const braveNote = brave >= 4 ? 'They\'re not reckless, but they\'ll take a calculated risk when the payoff is worth it.' : 'They prefer a plan to raw courage. Why take a risk when you can eliminate it?';
+      const trustNote = trust >= 4 ? 'Despite their reputation, they are surprisingly reliable — on their own terms.' : 'Their relationships are strategic. Everyone in their life serves a purpose, even if they\'d never say that out loud.';
+      const awareNote = aware >= 4 ? 'And what makes them dangerous is that they understand themselves just as well as they understand everyone else.' : 'Their weakness is that they underestimate how much their own ego shapes their decisions.';
+      return `${name} sees the board while everyone else is watching the pieces. They\'re rarely the loudest voice in the room — but they\'re usually the reason things go the way they do.${traitStr} ${braveNote} ${trustNote} ${awareNote} They make a riveting protagonist because you\'re never quite sure if you should root for them — and neither are they.`;
+    },
+    tip: 'Give your character a moment where their plan fails and emotion takes over. That\'s when the reader finally sees who they really are underneath all that control.'
+  }
+};
+
+// ─── GENERATE RESULT ─────────────────────────────────────────────────────────
+function generateResult() {
+  calcScores();
+  const type = getDominantType();
+  const profile = profiles[type];
+  const charName = document.getElementById('char-name').value.trim() || 'Your character';
+  const studentName = document.getElementById('student-name').value.trim();
+  const brave = scaleAnswers['q7'] || 3;
+  const trust = scaleAnswers['q8'] || 3;
+  const aware = scaleAnswers['q9'] || 3;
+  const traits = getSelectedTraits();
+
+  document.getElementById('res-student-label').textContent =
+    studentName ? `${studentName}'s character` : 'Character Profile';
+  document.getElementById('res-type').textContent = profile.type;
+  document.getElementById('res-subtitle').textContent = profile.subtitle;
+  document.getElementById('res-summary').innerHTML =
+    profile.summary(charName, brave, trust, aware, traits);
+
+  // Traits display
+  const traitsEl = document.getElementById('res-traits');
+  traitsEl.innerHTML = '';
+  if (traits.length > 0) {
+    traits.forEach(t => {
+      const chip = document.createElement('span');
+      chip.className = 'result-trait-chip highlight';
+      chip.textContent = t;
+      traitsEl.appendChild(chip);
+    });
+  } else {
+    traitsEl.style.display = 'none';
+  }
+
+  document.getElementById('res-writing-tip').textContent = profile.tip;
+
+  // Hide quiz, show result
+  document.querySelectorAll('.question-card').forEach(c => c.style.display = 'none');
+  document.querySelector('.progress-bar-wrap').style.display = 'none';
+  const resultEl = document.getElementById('result-section');
+  resultEl.style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Full progress
+  document.getElementById('progress-fill').style.width = '100%';
+}
+
+// ─── RETAKE ───────────────────────────────────────────────────────────────────
+function retake() { window.location.reload(); }
+</script>
+</body>
+</html>
