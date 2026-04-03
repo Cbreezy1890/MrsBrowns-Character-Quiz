@@ -546,10 +546,10 @@
     <p>Answer every question as your character — not yourself. Think about how <em>they</em> would react, what <em>they</em> want, and who <em>they</em> really are.</p>
   </header>
 
-  <div class="progress-bar-wrap">
+  <div class="progress-bar-wrap" id="progress-bar-wrap" style="display:none;">
     <div class="progress-meta">
-      <span id="progress-label">Question 1 of 11</span>
-      <span id="progress-pct">0%</span>
+      <span id="progress-label"></span>
+      <span id="progress-pct"></span>
     </div>
     <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
   </div>
@@ -782,24 +782,12 @@
     </div>
     <div class="nav-row">
       <button class="btn btn-ghost" onclick="prevCard(10)">← Back</button>
-      <button class="btn btn-primary" id="next-10" onclick="nextCard(10)">Next →</button>
-    </div>
-  </div>
-
-  <!-- Q11 Reflection -->
-  <div class="question-card" id="card-11">
-    <div class="section-label">Final Question</div>
-    <p class="question-text">In 2–3 sentences, describe your character in your own words.</p>
-    <div class="input-group">
-      <label>Your answer</label>
-      <textarea id="reflection" rows="5" style="width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);background:var(--paper);outline:none;resize:vertical;transition:border-color 0.2s;line-height:1.6;" placeholder="What makes your character who they are?" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
-    </div>
-    <div class="nav-row">
-      <button class="btn btn-ghost" onclick="prevCard(11)">← Back</button>
       <span></span>
     </div>
     <button class="btn btn-submit" onclick="generateResult()">✦ Reveal My Character →</button>
   </div>
+
+
 
   <!-- RESULT -->
   <div id="result-section">
@@ -821,8 +809,79 @@
 </div>
 
 <script>
+// ─── PROFANITY FILTER ────────────────────────────────────────────────────────
+// Whole-word only — these strings could appear in real names
+const wholeWordOnly = [
+  'damn','dammit','hell','crap','dick','homo','jerk','piss','sex','cum',
+  'fag','hoe','spic','rape','porn','tits','cock'
+];
+
+// Substring match — safe to flag anywhere in a string, won't appear in real names
+const substringMatch = [
+  'ass','asses','asshole','assholes','bastard','bitch','bitches','bullshit','cunt','cunts',
+  'dickhead','douche','douchebag','faggot','faggots','fuck','fucked','fucker',
+  'fuckers','fucking','fucks','jackass','motherfucker','motherfuckers',
+  'nigga','nigger','niggers','pissed','prick','pricks','pussy','pussies',
+  'retard','retarded','shit','shits','shitty','skank','slut','sluts',
+  'twat','twats','whore','whores','wtf','ballsack','blowjob','boner',
+  'butthole','chink','clit','clits','cocks','dildo','dyke','erection',
+  'handjob','jizz','kike','lesbo','molest','orgasm','penis','pervert',
+  'porno','prostitute','rapist','screwing','shag','spank','testicle',
+  'tranny','vagina','wank','wanker','fuckface','dipshit','numbnuts',
+  'scrotum','shitheads','suckmy','jackoff','jackoffs'
+];
+
+function containsBadWord(input) {
+  const cleaned = input.toLowerCase().replace(/[^a-z]/g, ' ').trim();
+  const words = cleaned.split(/\s+/);
+
+  // Whole-word check
+  if (words.some(w => wholeWordOnly.includes(w))) return true;
+
+  // Substring check — does the full cleaned string contain any of these
+  if (substringMatch.some(bad => cleaned.replace(/\s/g,'').includes(bad) || cleaned.includes(bad))) return true;
+
+  return false;
+}
+
+function showWarning(inputEl) {
+  // Remove any existing warning first
+  const existing = inputEl.parentNode.querySelector('.filter-warning');
+  if (existing) existing.remove();
+
+  inputEl.style.borderColor = 'var(--accent)';
+  inputEl.value = '';
+
+  const warning = document.createElement('p');
+  warning.className = 'filter-warning';
+  warning.style.cssText = 'margin-top:8px;font-size:13px;font-weight:500;color:var(--accent);';
+  warning.textContent = '✋ Make better choices! — Mrs. Brown';
+  inputEl.parentNode.appendChild(warning);
+
+  setTimeout(() => {
+    warning.remove();
+    inputEl.style.borderColor = 'var(--border)';
+  }, 3500);
+}
+
+function checkNameInputs() {
+  const studentInput = document.getElementById('student-name');
+  const charInput = document.getElementById('char-name');
+  let clean = true;
+
+  if (containsBadWord(studentInput.value)) {
+    showWarning(studentInput);
+    clean = false;
+  }
+  if (containsBadWord(charInput.value)) {
+    showWarning(charInput);
+    clean = false;
+  }
+  return clean;
+}
+
 // ─── STATE ───────────────────────────────────────────────────────────────────
-const TOTAL_CARDS = 11; // cards 1–11
+const TOTAL_CARDS = 10; // cards 1–10
 const scores = { leader: 0, loner: 0, empath: 0, strategist: 0 };
 const scaleAnswers = {};
 const answers = {};
@@ -832,6 +891,8 @@ function showCard(n) {
   document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
   document.getElementById('card-' + n).classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Hide progress bar on name card, show on all questions
+  document.getElementById('progress-bar-wrap').style.display = n === 0 ? 'none' : 'block';
   updateProgress(n);
 }
 
@@ -841,6 +902,7 @@ function nextCard(current) {
     const sn = document.getElementById('student-name').value.trim();
     const cn = document.getElementById('char-name').value.trim();
     if (!sn || !cn) { alert('Please fill in both names before continuing.'); return; }
+    if (!checkNameInputs()) return;
   }
   showCard(current + 1);
 }
@@ -850,9 +912,9 @@ function prevCard(current) { showCard(current - 1); }
 function updateProgress(cardIndex) {
   const pct = cardIndex === 0 ? 0 : Math.round((cardIndex / TOTAL_CARDS) * 100);
   document.getElementById('progress-fill').style.width = pct + '%';
-  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('progress-pct').textContent = cardIndex === 0 ? '' : pct + '%';
   if (cardIndex === 0) {
-    document.getElementById('progress-label').textContent = 'Let\'s get started';
+    document.getElementById('progress-label').textContent = '';
   } else {
     document.getElementById('progress-label').textContent = 'Question ' + cardIndex + ' of ' + TOTAL_CARDS;
   }
@@ -1000,6 +1062,7 @@ function generateResult() {
   const aware = scaleAnswers['q9'] || 3;
   const traits = getSelectedTraits();
 
+  // Pre-build result content while bar animates
   document.getElementById('res-student-label').textContent =
     studentName ? `${studentName}'s character` : 'Character Profile';
   document.getElementById('res-type').textContent = profile.type;
@@ -1007,7 +1070,6 @@ function generateResult() {
   document.getElementById('res-summary').innerHTML =
     profile.summary(charName, brave, trust, aware, traits);
 
-  // Traits display
   const traitsEl = document.getElementById('res-traits');
   traitsEl.innerHTML = '';
   if (traits.length > 0) {
@@ -1023,15 +1085,22 @@ function generateResult() {
 
   document.getElementById('res-writing-tip').textContent = profile.tip;
 
-  // Hide quiz, show result
-  document.querySelectorAll('.question-card').forEach(c => c.style.display = 'none');
-  document.querySelector('.progress-bar-wrap').style.display = 'none';
-  const resultEl = document.getElementById('result-section');
-  resultEl.style.display = 'block';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Animate bar to 100% first
+  const fill = document.getElementById('progress-fill');
+  const pctLabel = document.getElementById('progress-pct');
+  const progressLabel = document.getElementById('progress-label');
+  fill.style.width = '100%';
+  pctLabel.textContent = '100%';
+  progressLabel.textContent = 'Complete!';
 
-  // Full progress
-  document.getElementById('progress-fill').style.width = '100%';
+  // Hold at 100% briefly, then reveal result
+  setTimeout(() => {
+    document.querySelectorAll('.question-card').forEach(c => c.style.display = 'none');
+    document.getElementById('progress-bar-wrap').style.display = 'none';
+    const resultEl = document.getElementById('result-section');
+    resultEl.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 700);
 }
 
 // ─── RETAKE ───────────────────────────────────────────────────────────────────
