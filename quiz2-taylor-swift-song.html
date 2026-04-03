@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What Taylor Swift Song Does Your Character Cry To?</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400;1,600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1a0a2e;
+    --card: #241040;
+    --border: #3d2060;
+    --accent: #d4a7ff;
+    --accent2: #ff9eb5;
+    --accent3: #ffe066;
+    --text: #f5eeff;
+    --muted: #a090c0;
+    --progress-bg: #3d2060;
+    --glow: rgba(212,167,255,0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(212,167,255,0.18) 0%, transparent 45%),
+      radial-gradient(ellipse at 80% 90%, rgba(255,158,181,0.12) 0%, transparent 45%),
+      radial-gradient(ellipse at 50% 50%, rgba(255,224,102,0.04) 0%, transparent 60%);
+  }
+
+  .container { max-width: 680px; margin: 0 auto; padding: 44px 24px 80px; }
+
+  /* HEADER */
+  .quiz-header { text-align: center; margin-bottom: 44px; animation: fadeDown 0.7s ease both; }
+
+  .quiz-header .eyebrow {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--accent3); margin-bottom: 14px;
+  }
+
+  .quiz-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    font-weight: 700; line-height: 1.15; color: var(--text); margin-bottom: 14px;
+  }
+
+  .quiz-header h1 em { font-style: italic; color: var(--accent); }
+
+  .quiz-header p {
+    font-size: 15px; color: var(--muted); font-weight: 400;
+    max-width: 460px; margin: 0 auto; line-height: 1.75;
+  }
+
+  .sparkle-row { display: flex; justify-content: center; gap: 10px; margin: 16px 0; font-size: 16px; }
+
+  /* PROGRESS */
+  .progress-bar-wrap { margin-bottom: 32px; }
+  .progress-meta {
+    display: flex; justify-content: space-between; font-size: 12px;
+    color: var(--muted); margin-bottom: 8px; font-weight: 500; letter-spacing: 0.06em;
+  }
+  .progress-bar { height: 5px; background: var(--progress-bg); border-radius: 3px; overflow: hidden; }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+    border-radius: 3px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* CARDS */
+  .question-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+    padding: 32px; margin-bottom: 20px; display: none;
+    animation: fadeUp 0.45s ease both;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(212,167,255,0.1);
+  }
+  .question-card.active { display: block; }
+
+  .section-label {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 10px;
+  }
+
+  .question-emoji { font-size: 2rem; display: block; margin-bottom: 10px; }
+
+  .question-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem; font-weight: 600; line-height: 1.4;
+    color: var(--text); margin-bottom: 24px; font-style: italic;
+  }
+
+  /* INPUTS */
+  .input-group { margin-bottom: 20px; }
+  .input-group label {
+    display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+  }
+  .input-group input {
+    width: 100%; padding: 13px 16px; border: 1px solid var(--border);
+    border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px;
+    color: var(--text); background: var(--bg); outline: none; transition: border-color 0.2s;
+  }
+  .input-group input:focus { border-color: var(--accent); }
+  .input-group input::placeholder { color: var(--muted); }
+
+  /* CHOICES */
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+
+  .choice-btn {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px 18px; border: 1px solid var(--border); border-radius: 14px;
+    background: transparent; cursor: pointer; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 400; color: var(--text); text-align: left;
+    transition: all 0.2s ease; line-height: 1.5;
+  }
+
+  .choice-btn:hover {
+    border-color: var(--accent); background: var(--glow); transform: translateX(4px);
+  }
+
+  .choice-btn.selected {
+    border-color: var(--accent2); background: rgba(255,158,181,0.1);
+  }
+
+  .choice-emoji { font-size: 1.4rem; flex-shrink: 0; line-height: 1.3; }
+  .choice-text { flex: 1; }
+  .choice-title { font-weight: 600; color: var(--text); display: block; margin-bottom: 2px; }
+  .choice-sub { font-size: 12px; font-weight: 400; color: var(--muted); display: block; }
+
+  /* NAV */
+  .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; gap: 12px; }
+
+  .btn {
+    padding: 13px 28px; border-radius: 12px; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 600; cursor: pointer; border: none;
+    transition: all 0.2s ease;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #1a0a2e; box-shadow: 0 4px 16px rgba(212,167,255,0.3);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(212,167,255,0.4); }
+  .btn-primary:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--muted); color: var(--text); }
+
+  .btn-submit {
+    background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+    color: #1a0a2e; width: 100%; padding: 18px; font-size: 15px; font-weight: 700;
+    border-radius: 14px; box-shadow: 0 6px 24px rgba(212,167,255,0.3); margin-top: 28px;
+  }
+  .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(212,167,255,0.4); }
+
+  /* RESULT */
+  #result-section { display: none; animation: fadeUp 0.6s ease both; }
+
+  .result-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 24px;
+    padding: 48px 36px; text-align: center;
+    box-shadow: 0 8px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(212,167,255,0.15);
+  }
+
+  .result-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .result-emoji { font-size: 3.5rem; display: block; margin-bottom: 16px; }
+
+  .result-song {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.6rem, 5vw, 2.4rem);
+    font-weight: 700; font-style: italic;
+    color: var(--accent); margin-bottom: 6px; line-height: 1.2;
+  }
+
+  .result-album {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--accent3); margin-bottom: 8px;
+  }
+
+  .result-subtitle {
+    font-size: 0.95rem; font-weight: 500; color: var(--accent2); margin-bottom: 28px; letter-spacing: 0.03em;
+  }
+
+  .result-divider {
+    width: 60px; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    margin: 0 auto 28px; border-radius: 1px;
+  }
+
+  .result-summary {
+    font-size: 15px; line-height: 1.85; color: var(--text);
+    text-align: left; margin-bottom: 28px; font-weight: 400;
+  }
+
+  .result-reflection {
+    background: rgba(212,167,255,0.07); border-left: 3px solid var(--accent2);
+    border-radius: 0 12px 12px 0; padding: 18px 20px; text-align: left;
+    font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 32px;
+  }
+  .result-reflection strong {
+    color: var(--accent3); display: block; margin-bottom: 6px;
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+  }
+
+  .btn-retake {
+    background: transparent; border: 1px solid var(--border); color: var(--muted);
+    font-size: 13px; font-weight: 600; padding: 11px 24px; border-radius: 10px;
+    cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+  }
+  .btn-retake:hover { border-color: var(--accent); color: var(--accent); }
+
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 480px) {
+    .container { padding: 28px 16px 60px; }
+    .question-card { padding: 24px 18px; }
+    .result-card { padding: 36px 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="quiz-header">
+    <p class="eyebrow">✨ Character Study</p>
+    <h1>What Taylor Swift Song Does<br><em>Your Character Cry To?</em></h1>
+    <div class="sparkle-row">💜 ✨ 💜</div>
+    <p>Answer every question as your character — not yourself. What does the song they fall apart to say about their emotional state?</p>
+  </header>
+
+  <div class="progress-bar-wrap" style="display:none;">
+    <div class="progress-meta">
+      <span id="progress-label"></span>
+      <span id="progress-pct"></span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+
+  <!-- CARD 0: Names -->
+  <div class="question-card active" id="card-0">
+    <div class="section-label">Let's begin ✨</div>
+    <p class="question-text">First, tell us a little about who we're working with.</p>
+    <div class="input-group">
+      <label>Your Name (Student)</label>
+      <input type="text" id="student-name" placeholder="Your first and last name" />
+    </div>
+    <div class="input-group">
+      <label>Your Character's Name</label>
+      <input type="text" id="char-name" placeholder="What is your character called?" />
+    </div>
+    <div class="nav-row">
+      <span></span>
+      <button class="btn btn-primary" onclick="nextCard(0)">Begin ✨</button>
+    </div>
+  </div>
+
+  <!-- Q1 -->
+  <div class="question-card" id="card-1">
+    <div class="section-label">Question 1 of 7</div>
+    <span class="question-emoji">💔</span>
+    <p class="question-text">What kind of pain hits your character the hardest?</p>
+    <div class="choices" id="q1">
+      <button class="choice-btn" onclick="selectChoice('q1',0,'betrayal')">
+        <span class="choice-emoji">🗡️</span>
+        <span class="choice-text">
+          <span class="choice-title">Being betrayed by someone they trusted completely</span>
+          <span class="choice-sub">The ones closest to you can hurt you the most.</span>
+        </span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',1,'loss')">
+        <span class="choice-emoji">🌧️</span>
+        <span class="choice-text">
+          <span class="choice-title">Losing something they can never get back</span>
+          <span class="choice-sub">Some doors close and you feel them close forever.</span>
+        </span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',2,'invisible')">
+        <span class="choice-emoji">👻</span>
+        <span class="choice-text">
+          <span class="choice-title">Being unseen — like they don't matter to anyone</span>
+          <span class="choice-sub">The loneliness of being in a room full of people.</span>
+        </span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',3,'change')">
+        <span class="choice-emoji">🍂</span>
+        <span class="choice-text">
+          <span class="choice-title">Watching everything they knew change around them</span>
+          <span class="choice-sub">Nothing stays. That's the hardest truth.</span>
+        </span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(1)">← Back</button>
+      <button class="btn btn-primary" id="next-1" onclick="nextCard(1)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="question-card" id="card-2">
+    <div class="section-label">Question 2 of 7</div>
+    <span class="question-emoji">🥀</span>
+    <p class="question-text">How does your character carry their sadness?</p>
+    <div class="choices" id="q2">
+      <button class="choice-btn" onclick="selectChoice('q2',0,'betrayal')">
+        <span class="choice-emoji">🔥</span>
+        <span class="choice-text">
+          <span class="choice-title">It turns into something sharp — anger, spite, fire</span>
+          <span class="choice-sub">Grief with an edge. Pain that pushes back.</span>
+        </span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',1,'loss')">
+        <span class="choice-emoji">🌊</span>
+        <span class="choice-text">
+          <span class="choice-title">Like a wave — it comes and goes and comes back again</span>
+          <span class="choice-sub">They think they're over it. Then a song plays.</span>
+        </span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',2,'invisible')">
+        <span class="choice-emoji">🤫</span>
+        <span class="choice-text">
+          <span class="choice-title">Quietly — they smile and nobody knows</span>
+          <span class="choice-sub">They got good at hiding it a long time ago.</span>
+        </span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',3,'change')">
+        <span class="choice-emoji">📖</span>
+        <span class="choice-text">
+          <span class="choice-title">They sit with it — try to understand it, find meaning</span>
+          <span class="choice-sub">Everything hurts less once it makes sense.</span>
+        </span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(2)">← Back</button>
+      <button class="btn btn-primary" id="next-2" onclick="nextCard(2)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="question-card" id="card-3">
+    <div class="section-label">Question 3 of 7</div>
+    <span class="question-emoji">🪞</span>
+    <p class="question-text">When your character looks back at a painful moment, what do they feel most?</p>
+    <div class="choices" id="q3">
+      <button class="choice-btn" onclick="selectChoice('q3',0,'betrayal')">
+        <span class="choice-emoji">😤</span>
+        <span class="choice-text">
+          <span class="choice-title">Anger — they can't believe someone did that to them</span>
+          <span class="choice-sub">The disbelief never fully goes away.</span>
+        </span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',1,'loss')">
+        <span class="choice-emoji">💭</span>
+        <span class="choice-text">
+          <span class="choice-title">Nostalgia — they miss who they were back then</span>
+          <span class="choice-sub">Even painful times had something worth missing.</span>
+        </span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',2,'invisible')">
+        <span class="choice-emoji">😶</span>
+        <span class="choice-text">
+          <span class="choice-title">Numbness — they've processed it so many times it's just... there</span>
+          <span class="choice-sub">Not healed. Just worn smooth.</span>
+        </span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',3,'change')">
+        <span class="choice-emoji">🌱</span>
+        <span class="choice-text">
+          <span class="choice-title">Gratitude — it made them who they are now</span>
+          <span class="choice-sub">They wouldn't take it back even if they could.</span>
+        </span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(3)">← Back</button>
+      <button class="btn btn-primary" id="next-3" onclick="nextCard(3)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="question-card" id="card-4">
+    <div class="section-label">Question 4 of 7</div>
+    <span class="question-emoji">🌙</span>
+    <p class="question-text">What does your character do at their lowest point?</p>
+    <div class="choices" id="q4">
+      <button class="choice-btn" onclick="selectChoice('q4',0,'betrayal')">
+        <span class="choice-emoji">✍️</span>
+        <span class="choice-text">
+          <span class="choice-title">Plans. Thinks. Plots their next move.</span>
+          <span class="choice-sub">Sitting still with pain isn't an option. Action is.</span>
+        </span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',1,'loss')">
+        <span class="choice-emoji">🎵</span>
+        <span class="choice-text">
+          <span class="choice-title">Puts on a song and just lets it out</span>
+          <span class="choice-sub">Music says what they can't.</span>
+        </span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',2,'invisible')">
+        <span class="choice-emoji">🛏️</span>
+        <span class="choice-text">
+          <span class="choice-title">Disappears — needs to be alone to survive it</span>
+          <span class="choice-sub">The world can wait. They need to be invisible for a while.</span>
+        </span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',3,'change')">
+        <span class="choice-emoji">🌅</span>
+        <span class="choice-text">
+          <span class="choice-title">Finds something to hold onto — a reason to keep going</span>
+          <span class="choice-sub">Even at the bottom, they look for the light.</span>
+        </span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(4)">← Back</button>
+      <button class="btn btn-primary" id="next-4" onclick="nextCard(4)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="question-card" id="card-5">
+    <div class="section-label">Question 5 of 7</div>
+    <span class="question-emoji">💬</span>
+    <p class="question-text">If your character could say one thing to the person who hurt them, what would it be?</p>
+    <div class="choices" id="q5">
+      <button class="choice-btn" onclick="selectChoice('q5',0,'betrayal')">
+        <span class="choice-emoji">⚡</span>
+        <span class="choice-text">
+          <span class="choice-title">"You'll regret this. Watch."</span>
+          <span class="choice-sub">Not a threat. A prophecy.</span>
+        </span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',1,'loss')">
+        <span class="choice-emoji">🥺</span>
+        <span class="choice-text">
+          <span class="choice-title">"I just really miss who we used to be."</span>
+          <span class="choice-sub">The anger is gone. What's left is just sad.</span>
+        </span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',2,'invisible')">
+        <span class="choice-emoji">😶‍🌫️</span>
+        <span class="choice-text">
+          <span class="choice-title">"Did you ever actually see me at all?"</span>
+          <span class="choice-sub">The quietest question. The most devastating one.</span>
+        </span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',3,'change')">
+        <span class="choice-emoji">🕊️</span>
+        <span class="choice-text">
+          <span class="choice-title">"I forgive you. Not for you — for me."</span>
+          <span class="choice-sub">They've done the work. They're choosing peace.</span>
+        </span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(5)">← Back</button>
+      <button class="btn btn-primary" id="next-5" onclick="nextCard(5)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="question-card" id="card-6">
+    <div class="section-label">Question 6 of 7</div>
+    <span class="question-emoji">🌠</span>
+    <p class="question-text">What does healing look like for your character?</p>
+    <div class="choices" id="q6">
+      <button class="choice-btn" onclick="selectChoice('q6',0,'betrayal')">
+        <span class="choice-emoji">💪</span>
+        <span class="choice-text">
+          <span class="choice-title">Proving everyone wrong. Living well. Getting even by thriving.</span>
+          <span class="choice-sub">The best revenge is a good life and they know it.</span>
+        </span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',1,'loss')">
+        <span class="choice-emoji">🌸</span>
+        <span class="choice-text">
+          <span class="choice-title">Finding something new to love — slowly, carefully</span>
+          <span class="choice-sub">They open back up. It takes time. That's okay.</span>
+        </span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',2,'invisible')">
+        <span class="choice-emoji">✨</span>
+        <span class="choice-text">
+          <span class="choice-title">Finally feeling seen — by someone, by themselves</span>
+          <span class="choice-sub">The moment they stop shrinking is the moment everything shifts.</span>
+        </span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',3,'change')">
+        <span class="choice-emoji">🦋</span>
+        <span class="choice-text">
+          <span class="choice-title">Becoming someone new — not erasing the past, just outgrowing it</span>
+          <span class="choice-sub">They carry it with them but it doesn't carry them anymore.</span>
+        </span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(6)">← Back</button>
+      <button class="btn btn-primary" id="next-6" onclick="nextCard(6)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="question-card" id="card-7">
+    <div class="section-label">Question 7 of 7</div>
+    <span class="question-emoji">🎶</span>
+    <p class="question-text">Last one. What line sounds most like something your character would think at 2am?</p>
+    <div class="choices" id="q7">
+      <button class="choice-btn" onclick="selectChoice('q7',0,'betrayal')">
+        <span class="choice-emoji">😤</span>
+        <span class="choice-text">
+          <span class="choice-title">"I knew exactly who you were the whole time."</span>
+          <span class="choice-sub">Furious. Aware. Done.</span>
+        </span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',1,'loss')">
+        <span class="choice-emoji">🌙</span>
+        <span class="choice-text">
+          <span class="choice-title">"I still think about the way things used to be."</span>
+          <span class="choice-sub">Not bitter. Just missing something real.</span>
+        </span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',2,'invisible')">
+        <span class="choice-emoji">🫥</span>
+        <span class="choice-text">
+          <span class="choice-title">"What if nobody ever really knows me?"</span>
+          <span class="choice-sub">The fear under everything else.</span>
+        </span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',3,'change')">
+        <span class="choice-emoji">🌅</span>
+        <span class="choice-text">
+          <span class="choice-title">"I'm not who I was. And that's okay."</span>
+          <span class="choice-sub">Quiet peace. Hard won.</span>
+        </span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(7)">← Back</button>
+      <span></span>
+    </div>
+    <button class="btn btn-submit" onclick="generateResult()">💜 Reveal Their Song →</button>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-section">
+    <div class="result-card">
+      <p class="result-eyebrow" id="res-student-label"></p>
+      <span class="result-emoji" id="res-emoji"></span>
+      <h2 class="result-song" id="res-type"></h2>
+      <p class="result-album" id="res-album"></p>
+      <p class="result-subtitle" id="res-subtitle"></p>
+      <div class="result-divider"></div>
+      <p class="result-summary" id="res-summary"></p>
+      <div class="result-reflection">
+        <strong>✍️ Writing Tip</strong>
+        <span id="res-writing-tip"></span>
+      </div>
+      <button class="btn-retake" onclick="retake()">↩ Start Over</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── PROFANITY FILTER ────────────────────────────────────────────────────────
+const wholeWordOnly = [
+  'damn','dammit','hell','crap','dick','homo','jerk','piss','sex','cum',
+  'fag','hoe','spic','rape','porn','tits','cock'
+];
+const substringMatch = [
+  'ass','asses','asshole','assholes','bastard','bitch','bitches','bullshit','cunt','cunts',
+  'dickhead','douche','douchebag','faggot','faggots','fuck','fucked','fucker',
+  'fuckers','fucking','fucks','jackass','motherfucker','motherfuckers',
+  'nigga','nigger','niggers','pissed','prick','pricks','pussy','pussies',
+  'retard','retarded','shit','shits','shitty','skank','slut','sluts',
+  'twat','twats','whore','whores','wtf','ballsack','blowjob','boner',
+  'butthole','chink','clit','clits','cocks','dildo','dyke','erection',
+  'handjob','jizz','kike','lesbo','molest','orgasm','penis','pervert',
+  'porno','prostitute','rapist','screwing','shag','spank','testicle',
+  'tranny','vagina','wank','wanker','fuckface','dipshit','numbnuts',
+  'scrotum','shitheads','suckmy','jackoff','jackoffs'
+];
+
+function containsBadWord(input) {
+  const cleaned = input.toLowerCase().replace(/[^a-z]/g, ' ').trim();
+  const words = cleaned.split(/\s+/);
+  if (words.some(w => wholeWordOnly.includes(w))) return true;
+  if (substringMatch.some(bad => cleaned.replace(/\s/g,'').includes(bad) || cleaned.includes(bad))) return true;
+  return false;
+}
+
+function showWarning(inputEl) {
+  const existing = inputEl.parentNode.querySelector('.filter-warning');
+  if (existing) existing.remove();
+  inputEl.style.borderColor = 'var(--accent2)';
+  inputEl.value = '';
+  const warning = document.createElement('p');
+  warning.className = 'filter-warning';
+  warning.style.cssText = 'margin-top:8px;font-size:13px;font-weight:600;color:var(--accent2);';
+  warning.textContent = '✋ Make better choices! — Mrs. Brown';
+  inputEl.parentNode.appendChild(warning);
+  setTimeout(() => { warning.remove(); inputEl.style.borderColor = 'var(--border)'; }, 3500);
+}
+
+function checkNameInputs() {
+  const studentInput = document.getElementById('student-name');
+  const charInput = document.getElementById('char-name');
+  let clean = true;
+  if (containsBadWord(studentInput.value)) { showWarning(studentInput); clean = false; }
+  if (containsBadWord(charInput.value)) { showWarning(charInput); clean = false; }
+  return clean;
+}
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+const TOTAL_CARDS = 7;
+const answers = {};
+
+// ─── NAVIGATION ──────────────────────────────────────────────────────────────
+function showCard(n) {
+  document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
+  document.getElementById('card-' + n).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  const wrap = document.querySelector('.progress-bar-wrap');
+  wrap.style.display = n === 0 ? 'none' : 'block';
+  updateProgress(n);
+}
+
+function nextCard(current) {
+  if (current === 0) {
+    const sn = document.getElementById('student-name').value.trim();
+    const cn = document.getElementById('char-name').value.trim();
+    if (!sn || !cn) { alert('Please fill in both names before continuing.'); return; }
+    if (!checkNameInputs()) return;
+  }
+  showCard(current + 1);
+}
+
+function prevCard(current) { showCard(current - 1); }
+
+function updateProgress(cardIndex) {
+  const pct = cardIndex === 0 ? 0 : Math.round((cardIndex / TOTAL_CARDS) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = cardIndex === 0 ? '' : pct + '%';
+  document.getElementById('progress-label').textContent = cardIndex === 0 ? '' : 'Question ' + cardIndex + ' of ' + TOTAL_CARDS;
+}
+
+function selectChoice(qId, idx, type) {
+  const container = document.getElementById(qId);
+  container.querySelectorAll('.choice-btn').forEach((btn, i) => {
+    btn.classList.toggle('selected', i === idx);
+  });
+  answers[qId] = { idx, type };
+  const cardNum = parseInt(qId.replace('q', ''));
+  const nextBtn = document.getElementById('next-' + cardNum);
+  if (nextBtn) nextBtn.disabled = false;
+}
+
+function getDominantType() {
+  const scores = { betrayal: 0, loss: 0, invisible: 0, change: 0 };
+  Object.values(answers).forEach(a => { if (a && a.type) scores[a.type]++; });
+  return Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0];
+}
+
+// ─── RESULT PROFILES ─────────────────────────────────────────────────────────
+const profiles = {
+  betrayal: {
+    emoji: '🗡️',
+    song: '"Look What You Made Me Do"',
+    album: 'Reputation Era',
+    subtitle: 'Furious. Self-possessed. Not the victim anymore.',
+    summary: (name) => `${name} doesn\'t cry quietly. Their emotional state is the kind that burns — a grief that turned into something sharper somewhere along the way. They were hurt, yes. But what defines them now isn\'t the wound. It\'s what they did with it. Reputation-era energy means this character has been underestimated, dismissed, or betrayed by someone they trusted — and they made a decision: never again. Their tears, if they come at all, are private. What the world sees is the aftermath — a version of this character who has rebuilt themselves with armor on. The danger of this emotional state is that armor can become a prison. The writing opportunity is the moment someone gets close enough to see what\'s underneath it.`,
+    tip: 'Write the scene where your character\'s armor almost slips — where someone sees through it for just a second. That crack is where your reader will fall in love with them.'
+  },
+  loss: {
+    emoji: '🌧️',
+    song: '"All Too Well"',
+    album: 'Red Era',
+    subtitle: 'Still feeling everything. All of it. All too well.',
+    summary: (name) => `${name}\'s emotional state lives in memory. They are the kind of character who can be going about their day perfectly fine and then something — a smell, a song, a specific quality of afternoon light — pulls them back to something they thought they were over. Red-era energy is the most human kind of grief: not the sharp dramatic kind, but the long quiet kind that never fully resolves. This character loved something or someone deeply, and the loss of it left a shape in them that hasn\'t filled back in. They\'re not broken. They function. They even laugh. But there\'s a room inside them they don\'t go into. The writing opportunity is what happens when someone makes them go in anyway.`,
+    tip: 'Give your character a small moment of unexpected grief — triggered by something ordinary. A memory they didn\'t see coming. Don\'t explain it. Just let it land. The reader will feel it exactly the way you do.'
+  },
+  invisible: {
+    emoji: '🫥',
+    song: '"The Archer"',
+    album: 'Lover Era',
+    subtitle: 'Aching to be known. Terrified of what that means.',
+    summary: (name) => `${name}\'s deepest emotional wound is the fear that no one actually sees them — the real them, underneath the version they present to the world. Lover-era emotional energy, specifically the quiet devastation of a song like this, belongs to characters who have learned to perform okayness so convincingly that even the people who love them don\'t know how much they\'re holding. This character is not dramatic about their pain. They\'re private about it in a way that reads as fine from the outside and isn\'t. The writing opportunity here is extraordinary: the moment another character actually sees them — really sees them — is one of the most powerful things you can put on a page. And the moment ${name} lets themselves be seen is their whole arc.`,
+    tip: 'Write a scene where your character almost tells someone the truth about how they\'re feeling — and then doesn\'t. Show us what stops them. That moment of almost is more powerful than the confession itself.'
+  },
+  change: {
+    emoji: '🌿',
+    song: '"Clean"',
+    album: 'Folklore / Evermore Era',
+    subtitle: 'On the other side of something hard. Quietly becoming.',
+    summary: (name) => `${name}\'s emotional state is the rarest and most quietly powerful one: they are in the process of becoming. Folklore and Evermore emotional energy belongs to characters who have been through something — really through it — and are now doing the slow, unglamorous work of growing beyond it. They don\'t announce their healing. They don\'t perform it. It shows up in small ways: a decision they would have made differently a year ago, a moment where something that used to hurt doesn\'t anymore. This character is not finished. They\'re not perfectly healed. But they are moving — deliberately, thoughtfully — toward something. The writing opportunity is showing that quiet transformation in action, one small choice at a time.`,
+    tip: 'Show your character making a different choice than they would have made at the beginning of the story — without pointing it out. Let the reader notice the growth on their own. That\'s the most satisfying kind of character arc.'
+  }
+};
+
+// ─── GENERATE RESULT ─────────────────────────────────────────────────────────
+function generateResult() {
+  const type = getDominantType();
+  const profile = profiles[type];
+  const charName = document.getElementById('char-name').value.trim() || 'Your character';
+  const studentName = document.getElementById('student-name').value.trim();
+
+  document.getElementById('res-student-label').textContent = studentName ? `${studentName}'s character` : 'Character Profile';
+  document.getElementById('res-emoji').textContent = profile.emoji;
+  document.getElementById('res-type').textContent = profile.song;
+  document.getElementById('res-album').textContent = profile.album;
+  document.getElementById('res-subtitle').textContent = profile.subtitle;
+  document.getElementById('res-summary').textContent = profile.summary(charName);
+  document.getElementById('res-writing-tip').textContent = profile.tip;
+
+  const fill = document.getElementById('progress-fill');
+  const pctLabel = document.getElementById('progress-pct');
+  const progressLabel = document.getElementById('progress-label');
+  fill.style.width = '100%';
+  pctLabel.textContent = '100%';
+  progressLabel.textContent = 'Complete! 💜';
+
+  setTimeout(() => {
+    document.querySelectorAll('.question-card').forEach(c => c.style.display = 'none');
+    document.querySelector('.progress-bar-wrap').style.display = 'none';
+    document.getElementById('result-section').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 700);
+}
+
+function retake() { window.location.reload(); }
+</script>
+</body>
+</html>
