@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What Animated Villain Energy Does Your Character Have?</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080608;
+    --card: #110a0a;
+    --border: #3a1818;
+    --text: #f5eaea;
+    --muted: #9a8080;
+    --accent: #dc2626;
+    --accent2: #f59e0b;
+    --accent3: #b91c1c;
+    --accent4: #34d399;
+    --progress-bg: #2a1010;
+    --glow: rgba(220,38,38,0.1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(185,28,28,0.18) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, rgba(220,38,38,0.1) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(245,158,11,0.04) 0%, transparent 60%);
+  }
+
+  .container { max-width: 680px; margin: 0 auto; padding: 44px 24px 80px; }
+
+  /* HEADER */
+  .quiz-header { text-align: center; margin-bottom: 44px; animation: fadeDown 0.7s ease both; }
+
+  .quiz-header .eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.35em;
+    text-transform: uppercase; color: var(--accent2); margin-bottom: 16px;
+  }
+
+  .quiz-header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.7rem, 5.5vw, 2.8rem);
+    font-weight: 900; line-height: 1.15; color: var(--text); margin-bottom: 14px;
+  }
+
+  .quiz-header h1 span { color: var(--accent); }
+
+  .villain-row {
+    display: flex; justify-content: center; gap: 12px;
+    margin: 16px 0; font-size: 1.6rem;
+  }
+
+  .quiz-header p {
+    font-size: 19px; color: var(--muted); font-weight: 500;
+    max-width: 460px; margin: 0 auto; line-height: 1.8;
+  }
+
+  /* PROGRESS */
+  .progress-bar-wrap { margin-bottom: 32px; }
+  .progress-meta {
+    display: flex; justify-content: space-between; font-size: 12px;
+    color: var(--muted); margin-bottom: 8px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase; font-family: 'Cinzel', serif;
+  }
+  .progress-bar { height: 3px; background: var(--progress-bg); border-radius: 2px; overflow: hidden; }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+    border-radius: 2px; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* CARDS */
+  .question-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 18px;
+    padding: 34px 30px; margin-bottom: 20px; display: none;
+    animation: fadeUp 0.45s ease both;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(192,132,252,0.08);
+  }
+  .question-card.active { display: block; }
+
+  .section-label {
+    font-family: 'Cinzel', serif;
+    font-size: 13px; font-weight: 700; letter-spacing: 0.25em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
+  }
+
+  .question-emoji { font-size: 2rem; display: block; margin-bottom: 12px; }
+
+  .question-text {
+    font-family: 'Cinzel', serif;
+    font-size: 1.35rem; font-weight: 700; line-height: 1.45;
+    color: var(--text); margin-bottom: 26px;
+  }
+
+  /* CHOICES */
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+
+  .choice-btn {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px 18px; border: 1px solid var(--border); border-radius: 12px;
+    background: transparent; cursor: pointer; font-family: 'Outfit', sans-serif;
+    font-size: 16px; font-weight: 500; color: var(--text); text-align: left;
+    transition: all 0.2s ease; line-height: 1.5;
+  }
+
+  .choice-btn:hover { border-color: var(--accent); background: var(--glow); transform: translateX(4px); }
+  .choice-btn.selected { border-color: var(--accent); background: var(--glow); }
+
+  .choice-emoji { font-size: 1.4rem; flex-shrink: 0; line-height: 1.3; }
+  .choice-text { flex: 1; }
+  .choice-title { font-weight: 600; color: var(--text); display: block; margin-bottom: 3px; font-size: 17px; }
+  .choice-sub { font-size: 15px; font-weight: 400; color: var(--muted); display: block; }
+
+  /* INPUTS */
+  .input-group { margin-bottom: 20px; }
+  .input-group label {
+    display: block; font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+  }
+  .input-group input {
+    width: 100%; padding: 13px 16px; border: 1px solid var(--border);
+    border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 16px;
+    color: var(--text); background: var(--bg); outline: none; transition: border-color 0.2s;
+  }
+  .input-group input:focus { border-color: var(--accent); }
+  .input-group input::placeholder { color: var(--muted); }
+
+  /* NAV */
+  .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; gap: 12px; }
+
+  .btn {
+    padding: 13px 28px; border-radius: 10px; font-family: 'Cinzel', serif;
+    font-size: 12px; font-weight: 700; cursor: pointer; border: none;
+    transition: all 0.2s ease; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+
+  .btn-primary { background: var(--accent); color: white; box-shadow: 0 4px 16px rgba(220,38,38,0.35); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(220,38,38,0.5); }
+  .btn-primary:disabled { opacity: 0.25; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--muted); color: var(--text); }
+
+  .btn-submit {
+    background: linear-gradient(135deg, var(--accent3), var(--accent));
+    color: white; width: 100%; padding: 18px; font-size: 12px; font-weight: 700;
+    border-radius: 12px; box-shadow: 0 6px 24px rgba(220,38,38,0.35);
+    margin-top: 28px; letter-spacing: 0.15em; text-transform: uppercase;
+    font-family: 'Cinzel', serif;
+  }
+  .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(220,38,38,0.5); }
+
+  /* RESULT */
+  #result-section { display: none; animation: fadeUp 0.6s ease both; }
+
+  .result-card {
+    border-radius: 22px; padding: 52px 40px; text-align: center;
+    box-shadow: 0 12px 60px rgba(0,0,0,0.6);
+  }
+
+  .result-eyebrow {
+    font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 14px; opacity: 0.6;
+  }
+
+  .result-emoji { font-size: 4rem; display: block; margin-bottom: 16px; }
+
+  .result-villain-name {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.6rem, 5vw, 2.4rem);
+    font-weight: 900; margin-bottom: 6px; line-height: 1.2;
+  }
+
+  .result-movie {
+    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 10px; opacity: 0.6;
+  }
+
+  .result-subtitle {
+    font-size: 17px; font-weight: 500; margin-bottom: 30px;
+    letter-spacing: 0.02em; font-family: 'Outfit', sans-serif;
+  }
+
+  .result-divider { width: 50px; height: 2px; margin: 0 auto 30px; border-radius: 1px; }
+
+  .result-summary {
+    font-size: 16px; line-height: 1.85; text-align: left;
+    margin-bottom: 28px; font-weight: 400; font-family: 'Outfit', sans-serif;
+  }
+
+  .result-reflection {
+    border-left: 2px solid; border-radius: 0 10px 10px 0;
+    padding: 18px 20px; text-align: left; font-size: 15px;
+    line-height: 1.7; margin-bottom: 32px; font-family: 'Outfit', sans-serif;
+  }
+  .result-reflection strong {
+    display: block; margin-bottom: 6px; font-size: 10px;
+    letter-spacing: 0.2em; text-transform: uppercase; font-weight: 700;
+    font-family: 'Cinzel', serif;
+  }
+
+  .btn-retake {
+    background: transparent; font-size: 11px; font-weight: 700; padding: 11px 24px;
+    border-radius: 10px; cursor: pointer; font-family: 'Cinzel', serif;
+    transition: all 0.2s; letter-spacing: 0.12em; text-transform: uppercase; border: 1px solid;
+  }
+
+  /* VILLAIN THEMES */
+  .villain-scar {
+    background: #1a1200; color: #f0e0a0; border: 1px solid #5a4000;
+  }
+  .villain-scar .result-villain-name { color: #f59e0b; }
+  .villain-scar .result-divider { background: linear-gradient(90deg, #f59e0b, #854d0e); }
+  .villain-scar .result-summary { color: #e0c870; }
+  .villain-scar .result-reflection { background: rgba(245,158,11,0.08); border-color: #f59e0b; color: #c09040; }
+  .villain-scar .result-reflection strong { color: #f59e0b; }
+  .villain-scar .btn-retake { border-color: #5a4000; color: #c09040; }
+  .villain-scar .btn-retake:hover { border-color: #f59e0b; color: #f59e0b; }
+
+  .villain-ursula {
+    background: #0a0820; color: #e8d8ff; border: 1px solid #4a2080;
+  }
+  .villain-ursula .result-villain-name { color: #c084fc; }
+  .villain-ursula .result-divider { background: linear-gradient(90deg, #c084fc, #7c3aed); }
+  .villain-ursula .result-summary { color: #d0b8f0; }
+  .villain-ursula .result-reflection { background: rgba(192,132,252,0.1); border-color: #c084fc; color: #a080c0; }
+  .villain-ursula .result-reflection strong { color: #c084fc; }
+  .villain-ursula .btn-retake { border-color: #4a2080; color: #a080c0; }
+  .villain-ursula .btn-retake:hover { border-color: #c084fc; color: #c084fc; }
+
+  .villain-syndrome {
+    background: #1a0808; color: #ffe8e8; border: 1px solid #801010;
+  }
+  .villain-syndrome .result-villain-name { color: #ef4444; }
+  .villain-syndrome .result-divider { background: linear-gradient(90deg, #ef4444, #991b1b); }
+  .villain-syndrome .result-summary { color: #f0c8c8; }
+  .villain-syndrome .result-reflection { background: rgba(239,68,68,0.1); border-color: #ef4444; color: #c08080; }
+  .villain-syndrome .result-reflection strong { color: #ef4444; }
+  .villain-syndrome .btn-retake { border-color: #801010; color: #c08080; }
+  .villain-syndrome .btn-retake:hover { border-color: #ef4444; color: #ef4444; }
+
+  .villain-gaston {
+    background: #0a1020; color: #d8e8ff; border: 1px solid #102080;
+  }
+  .villain-gaston .result-villain-name { color: #60a5fa; }
+  .villain-gaston .result-divider { background: linear-gradient(90deg, #60a5fa, #1d4ed8); }
+  .villain-gaston .result-summary { color: #b0c8f0; }
+  .villain-gaston .result-reflection { background: rgba(96,165,250,0.1); border-color: #60a5fa; color: #7090c0; }
+  .villain-gaston .result-reflection strong { color: #60a5fa; }
+  .villain-gaston .btn-retake { border-color: #102080; color: #7090c0; }
+  .villain-gaston .btn-retake:hover { border-color: #60a5fa; color: #60a5fa; }
+
+  .villain-maleficent {
+    background: #060a14; color: #d8f0e8; border: 1px solid #104030;
+  }
+  .villain-maleficent .result-villain-name { color: #34d399; }
+  .villain-maleficent .result-divider { background: linear-gradient(90deg, #34d399, #065f46); }
+  .villain-maleficent .result-summary { color: #a0d8c0; }
+  .villain-maleficent .result-reflection { background: rgba(52,211,153,0.08); border-color: #34d399; color: #60a080; }
+  .villain-maleficent .result-reflection strong { color: #34d399; }
+  .villain-maleficent .btn-retake { border-color: #104030; color: #60a080; }
+  .villain-maleficent .btn-retake:hover { border-color: #34d399; color: #34d399; }
+
+  .villain-yzma {
+    background: #1a0818; color: #ffe8f8; border: 1px solid #801060;
+  }
+  .villain-yzma .result-villain-name { color: #f472b6; }
+  .villain-yzma .result-divider { background: linear-gradient(90deg, #f472b6, #9d174d); }
+  .villain-yzma .result-summary { color: #f0b8d8; }
+  .villain-yzma .result-reflection { background: rgba(244,114,182,0.1); border-color: #f472b6; color: #c070a0; }
+  .villain-yzma .result-reflection strong { color: #f472b6; }
+  .villain-yzma .btn-retake { border-color: #801060; color: #c070a0; }
+  .villain-yzma .btn-retake:hover { border-color: #f472b6; color: #f472b6; }
+
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 480px) {
+    .container { padding: 28px 16px 60px; }
+    .question-card { padding: 24px 18px; }
+    .result-card { padding: 36px 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="quiz-header">
+    <p class="eyebrow">✦ Character Study ✦</p>
+    <h1>What Animated Villain Energy<br>Does <span>Your Character</span> Have?</h1>
+    <div class="villain-row">🦁 🐙 ⚡ 💪 🌿 💜</div>
+    <p>Every character has a little villain in them. Answer as your character — not yourself. Which Disney or Pixar antagonist energy is theirs?</p>
+  </header>
+
+  <div class="progress-bar-wrap" style="display:none;">
+    <div class="progress-meta">
+      <span id="progress-label"></span>
+      <span id="progress-pct"></span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+
+  <!-- CARD 0 -->
+  <div class="question-card active" id="card-0">
+    <div class="section-label">✦ Let's Begin</div>
+    <p class="question-text">First, tell us a little about who we're working with.</p>
+    <div class="input-group">
+      <label>Your Name (Student)</label>
+      <input type="text" id="student-name" placeholder="Your first and last name" />
+    </div>
+    <div class="input-group">
+      <label>Your Character's Name</label>
+      <input type="text" id="char-name" placeholder="What is your character called?" />
+    </div>
+    <div class="nav-row">
+      <span></span>
+      <button class="btn btn-primary" onclick="nextCard(0)">Enter the Story ✦</button>
+    </div>
+  </div>
+
+  <!-- Q1 -->
+  <div class="question-card" id="card-1">
+    <div class="section-label">Question 1 of 7</div>
+    <span class="question-emoji">👑</span>
+    <p class="question-text">What does your character want more than anything else?</p>
+    <div class="choices" id="q1">
+      <button class="choice-btn" onclick="selectChoice('q1',0,'scar')">
+        <span class="choice-emoji">🦁</span><span class="choice-text">
+        <span class="choice-title">Power — to be the one making the decisions</span>
+        <span class="choice-sub">They've been waiting. Their time is coming. They're patient about it.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',1,'ursula')">
+        <span class="choice-emoji">🌊</span><span class="choice-text">
+        <span class="choice-title">To be recognized — seen as someone powerful and impressive</span>
+        <span class="choice-sub">They have a lot to offer. The world just hasn't noticed yet.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',2,'syndrome')">
+        <span class="choice-emoji">⚡</span><span class="choice-text">
+        <span class="choice-title">To prove everyone who doubted them completely wrong</span>
+        <span class="choice-sub">Someone told them they couldn't. That was a mistake.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',3,'gaston')">
+        <span class="choice-emoji">🏆</span><span class="choice-text">
+        <span class="choice-title">To be the best — at everything, always, without question</span>
+        <span class="choice-sub">Second place isn't losing. It's just first place with less bragging rights.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',4,'maleficent')">
+        <span class="choice-emoji">🌿</span><span class="choice-text">
+        <span class="choice-title">Respect — for who they are and what they stand for</span>
+        <span class="choice-sub">They have a code. They expect others to honor it.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',5,'yzma')">
+        <span class="choice-emoji">💜</span><span class="choice-text">
+        <span class="choice-title">To win — by whatever method turns out to be available</span>
+        <span class="choice-sub">The plan changes. The goal doesn't. Details are flexible.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(1)">← Back</button>
+      <button class="btn btn-primary" id="next-1" onclick="nextCard(1)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="question-card" id="card-2">
+    <div class="section-label">Question 2 of 7</div>
+    <span class="question-emoji">😤</span>
+    <p class="question-text">Someone gets in your character's way. What's their move?</p>
+    <div class="choices" id="q2">
+      <button class="choice-btn" onclick="selectChoice('q2',0,'scar')">
+        <span class="choice-emoji">🎭</span><span class="choice-text">
+        <span class="choice-title">Smile, stay calm, and wait for the right moment</span>
+        <span class="choice-sub">Patience is a weapon. They have plenty of it.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',1,'ursula')">
+        <span class="choice-emoji">🤝</span><span class="choice-text">
+        <span class="choice-title">Make a deal — give them what they want to get what they need</span>
+        <span class="choice-sub">Everyone wants something. That's very useful.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',2,'syndrome')">
+        <span class="choice-emoji">💢</span><span class="choice-text">
+        <span class="choice-title">Get angry — then channel it into working even harder</span>
+        <span class="choice-sub">Obstacles are just extra motivation. Bring them on.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',3,'gaston')">
+        <span class="choice-emoji">😤</span><span class="choice-text">
+        <span class="choice-title">Push through — they don't move around people, people move for them</span>
+        <span class="choice-sub">Getting out of the way is just the smart thing to do. Obviously.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',4,'maleficent')">
+        <span class="choice-emoji">❄️</span><span class="choice-text">
+        <span class="choice-title">Go cold and make sure they remember this moment</span>
+        <span class="choice-sub">They don't forget. And they don't let people forget either.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',5,'yzma')">
+        <span class="choice-emoji">🌀</span><span class="choice-text">
+        <span class="choice-title">Come up with a completely unexpected solution that nobody saw coming</span>
+        <span class="choice-sub">Unconventional? Yes. Effective? Mostly. Entertaining? Always.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(2)">← Back</button>
+      <button class="btn btn-primary" id="next-2" onclick="nextCard(2)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="question-card" id="card-3">
+    <div class="section-label">Question 3 of 7</div>
+    <span class="question-emoji">🗣️</span>
+    <p class="question-text">How does your character come across to people who don't know them well?</p>
+    <div class="choices" id="q3">
+      <button class="choice-btn" onclick="selectChoice('q3',0,'scar')">
+        <span class="choice-emoji">😏</span><span class="choice-text">
+        <span class="choice-title">Charming — maybe a little too smooth, but hard to dislike</span>
+        <span class="choice-sub">They know how to work a room. They've always known.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',1,'ursula')">
+        <span class="choice-emoji">🎪</span><span class="choice-text">
+        <span class="choice-title">Bold and larger than life — takes up space and owns it</span>
+        <span class="choice-sub">They're a lot. They know. They lean into it.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',2,'syndrome')">
+        <span class="choice-emoji">🔥</span><span class="choice-text">
+        <span class="choice-title">Intense — clearly driven by something, even if you're not sure what</span>
+        <span class="choice-sub">There's an energy about them. You can feel it before they say a word.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',3,'gaston')">
+        <span class="choice-emoji">💪</span><span class="choice-text">
+        <span class="choice-title">Confident to the point where it's almost funny — but they're serious</span>
+        <span class="choice-sub">They genuinely believe they're great. The conviction is kind of impressive.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',4,'maleficent')">
+        <span class="choice-emoji">🌑</span><span class="choice-text">
+        <span class="choice-title">Mysterious and a little intimidating — people aren't sure what to make of them</span>
+        <span class="choice-sub">They don't explain themselves. That's on purpose.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',5,'yzma')">
+        <span class="choice-emoji">🎭</span><span class="choice-text">
+        <span class="choice-title">Unpredictable — you're never quite sure what they're going to do next</span>
+        <span class="choice-sub">Even people who know them well can't always predict it. That's the point.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(3)">← Back</button>
+      <button class="btn btn-primary" id="next-3" onclick="nextCard(3)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="question-card" id="card-4">
+    <div class="section-label">Question 4 of 7</div>
+    <span class="question-emoji">💔</span>
+    <p class="question-text">What's the thing that could actually get to your character — their real weak spot?</p>
+    <div class="choices" id="q4">
+      <button class="choice-btn" onclick="selectChoice('q4',0,'scar')">
+        <span class="choice-emoji">😒</span><span class="choice-text">
+        <span class="choice-title">Being underestimated — treated like they're less than they are</span>
+        <span class="choice-sub">They've spent too long being overlooked. It still stings.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',1,'ursula')">
+        <span class="choice-emoji">🙄</span><span class="choice-text">
+        <span class="choice-title">Being ignored — like they don't matter or aren't worth attention</span>
+        <span class="choice-sub">They have presence. Not noticing it is almost insulting.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',2,'syndrome')">
+        <span class="choice-emoji">😤</span><span class="choice-text">
+        <span class="choice-title">Being told they don't belong — that they're not good enough</span>
+        <span class="choice-sub">Someone said it once. They never forgot. They never will.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',3,'gaston')">
+        <span class="choice-emoji">😳</span><span class="choice-text">
+        <span class="choice-title">Being rejected — especially in front of other people</span>
+        <span class="choice-sub">It's not supposed to go this way. This isn't how the story goes.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',4,'maleficent')">
+        <span class="choice-emoji">🥺</span><span class="choice-text">
+        <span class="choice-title">Being betrayed — especially by someone they trusted</span>
+        <span class="choice-sub">It's happened before. They built walls because of it. High ones.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',5,'yzma')">
+        <span class="choice-emoji">🙈</span><span class="choice-text">
+        <span class="choice-title">Not being taken seriously — people laughing at their plans</span>
+        <span class="choice-sub">The plans are good. Everyone will see that eventually. Probably.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(4)">← Back</button>
+      <button class="btn btn-primary" id="next-4" onclick="nextCard(4)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="question-card" id="card-5">
+    <div class="section-label">Question 5 of 7</div>
+    <span class="question-emoji">🌑</span>
+    <p class="question-text">Your character's at their best when...</p>
+    <div class="choices" id="q5">
+      <button class="choice-btn" onclick="selectChoice('q5',0,'scar')">
+        <span class="choice-emoji">♟️</span><span class="choice-text">
+        <span class="choice-title">They're playing the long game and it's all going according to plan</span>
+        <span class="choice-sub">Every piece is in place. They've been moving them for a while now.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',1,'ursula')">
+        <span class="choice-emoji">🎤</span><span class="choice-text">
+        <span class="choice-title">All eyes are on them and they're delivering</span>
+        <span class="choice-sub">This is their moment and they are making the absolute most of it.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',2,'syndrome')">
+        <span class="choice-emoji">⚙️</span><span class="choice-text">
+        <span class="choice-title">They're building something — creating, inventing, figuring it out</span>
+        <span class="choice-sub">When they're making something real, they're unstoppable.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',3,'gaston')">
+        <span class="choice-emoji">🦅</span><span class="choice-text">
+        <span class="choice-title">They're winning and everyone can see it</span>
+        <span class="choice-sub">The crowd is watching. They're performing. This is exactly right.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',4,'maleficent')">
+        <span class="choice-emoji">🌲</span><span class="choice-text">
+        <span class="choice-title">They're protecting something or someone they actually care about</span>
+        <span class="choice-sub">There's a reason underneath all of it. This is it.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',5,'yzma')">
+        <span class="choice-emoji">🧪</span><span class="choice-text">
+        <span class="choice-title">Nothing is going according to plan and they're improvising brilliantly</span>
+        <span class="choice-sub">Chaos is just an opportunity in disguise. They excel here.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(5)">← Back</button>
+      <button class="btn btn-primary" id="next-5" onclick="nextCard(5)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="question-card" id="card-6">
+    <div class="section-label">Question 6 of 7</div>
+    <span class="question-emoji">🤝</span>
+    <p class="question-text">How does your character treat people who are useful to them?</p>
+    <div class="choices" id="q6">
+      <button class="choice-btn" onclick="selectChoice('q6',0,'scar')">
+        <span class="choice-emoji">🎭</span><span class="choice-text">
+        <span class="choice-title">Keeps them close — friendly on the surface, always watching</span>
+        <span class="choice-sub">Allies are useful. They're just also a little expendable.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',1,'ursula')">
+        <span class="choice-emoji">📜</span><span class="choice-text">
+        <span class="choice-title">Makes agreements — clear terms, mutual benefit, they hold up their end</span>
+        <span class="choice-sub">Deals work when everyone gets something. They believe in deals.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',2,'syndrome')">
+        <span class="choice-emoji">🔧</span><span class="choice-text">
+        <span class="choice-title">Uses them as part of the bigger plan — they're a means to an end</span>
+        <span class="choice-sub">The mission matters most. Everyone has a role. Including them.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',3,'gaston')">
+        <span class="choice-emoji">😁</span><span class="choice-text">
+        <span class="choice-title">Treats them well — as long as they're appreciating them properly</span>
+        <span class="choice-sub">Loyalty is rewarded. Disloyalty is not tolerated. Simple.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',4,'maleficent')">
+        <span class="choice-emoji">🛡️</span><span class="choice-text">
+        <span class="choice-title">Fiercely loyal to a small circle — everyone else is on the outside</span>
+        <span class="choice-sub">Getting in is hard. Once you're in, they'd do anything for you.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',5,'yzma')">
+        <span class="choice-emoji">🤔</span><span class="choice-text">
+        <span class="choice-title">Inconsistently — depends entirely on the mood and the plan</span>
+        <span class="choice-sub">Their team never quite knows what to expect. Which keeps things interesting.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(6)">← Back</button>
+      <button class="btn btn-primary" id="next-6" onclick="nextCard(6)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="question-card" id="card-7">
+    <div class="section-label">Question 7 of 7</div>
+    <span class="question-emoji">✨</span>
+    <p class="question-text">Last one. Deep down, underneath everything — what is your character really afraid of?</p>
+    <div class="choices" id="q7">
+      <button class="choice-btn" onclick="selectChoice('q7',0,'scar')">
+        <span class="choice-emoji">👑</span><span class="choice-text">
+        <span class="choice-title">Never getting what they deserve — being passed over forever</span>
+        <span class="choice-sub">They've waited long enough. The clock is ticking.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',1,'ursula')">
+        <span class="choice-emoji">🌊</span><span class="choice-text">
+        <span class="choice-title">Fading away — becoming someone no one remembers</span>
+        <span class="choice-sub">They need to leave a mark. Disappearing quietly is not an option.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',2,'syndrome')">
+        <span class="choice-emoji">⚡</span><span class="choice-text">
+        <span class="choice-title">That the people who wrote them off were actually right</span>
+        <span class="choice-sub">What if they're not good enough after all? They can't let that be true.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',3,'gaston')">
+        <span class="choice-emoji">🪞</span><span class="choice-text">
+        <span class="choice-title">That they're not actually as great as they think — and someone will notice</span>
+        <span class="choice-sub">The confidence is real. The doubt underneath it is real too.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',4,'maleficent')">
+        <span class="choice-emoji">🥀</span><span class="choice-text">
+        <span class="choice-title">Being hurt again — trusting the wrong person one more time</span>
+        <span class="choice-sub">They've paid the price before. They're not paying it again.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',5,'yzma')">
+        <span class="choice-emoji">😂</span><span class="choice-text">
+        <span class="choice-title">Being the punchline — having people laugh at them instead of with them</span>
+        <span class="choice-sub">They know they're a lot. They just want to be a lot on their own terms.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(7)">← Back</button>
+      <span></span>
+    </div>
+    <button class="btn btn-submit" onclick="generateResult()">✦ Reveal Their Villain Energy →</button>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-section">
+    <div class="result-card" id="result-card">
+      <p class="result-eyebrow" id="res-student-label"></p>
+      <span class="result-emoji" id="res-emoji"></span>
+      <p class="result-movie" id="res-movie"></p>
+      <h2 class="result-villain-name" id="res-type"></h2>
+      <p class="result-subtitle" id="res-subtitle"></p>
+      <div class="result-divider" id="res-divider"></div>
+      <p class="result-summary" id="res-summary"></p>
+      <div class="result-reflection" id="res-reflection">
+        <strong>✍️ Writing Tip</strong>
+        <span id="res-writing-tip"></span>
+      </div>
+      <button class="btn-retake" onclick="retake()">↩ Start Over</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── PROFANITY FILTER ────────────────────────────────────────────────────────
+const wholeWordOnly = ['damn','dammit','hell','crap','dick','homo','jerk','piss','sex','cum','fag','hoe','spic','rape','porn','tits','cock'];
+const substringMatch = ['ass','asses','asshole','assholes','bastard','bitch','bitches','bullshit','cunt','cunts','dickhead','douche','douchebag','faggot','faggots','fuck','fucked','fucker','fuckers','fucking','fucks','jackass','motherfucker','motherfuckers','nigga','nigger','niggers','pissed','prick','pricks','pussy','pussies','retard','retarded','shit','shits','shitty','skank','slut','sluts','twat','twats','whore','whores','wtf','ballsack','blowjob','boner','butthole','chink','clit','clits','cocks','dildo','dyke','erection','handjob','jizz','kike','lesbo','molest','orgasm','penis','pervert','porno','prostitute','rapist','screwing','shag','spank','testicle','tranny','vagina','wank','wanker','fuckface','dipshit','numbnuts','scrotum','shitheads','suckmy','jackoff','jackoffs'];
+
+function containsBadWord(input) {
+  const cleaned = input.toLowerCase().replace(/[^a-z]/g, ' ').trim();
+  const words = cleaned.split(/\s+/);
+  if (words.some(w => wholeWordOnly.includes(w))) return true;
+  if (substringMatch.some(bad => cleaned.replace(/\s/g,'').includes(bad) || cleaned.includes(bad))) return true;
+  return false;
+}
+function showWarning(inputEl) {
+  const existing = inputEl.parentNode.querySelector('.filter-warning');
+  if (existing) existing.remove();
+  inputEl.style.borderColor = 'var(--accent3)';
+  inputEl.value = '';
+  const warning = document.createElement('p');
+  warning.className = 'filter-warning';
+  warning.style.cssText = 'margin-top:8px;font-size:13px;font-weight:600;color:var(--accent3);font-family:"Outfit",sans-serif;letter-spacing:0.05em;';
+  warning.textContent = '✦ Make better choices! — Mrs. Brown';
+  inputEl.parentNode.appendChild(warning);
+  setTimeout(() => { warning.remove(); inputEl.style.borderColor = 'var(--border)'; }, 3500);
+}
+function checkNameInputs() {
+  const s = document.getElementById('student-name');
+  const c = document.getElementById('char-name');
+  let clean = true;
+  if (containsBadWord(s.value)) { showWarning(s); clean = false; }
+  if (containsBadWord(c.value)) { showWarning(c); clean = false; }
+  return clean;
+}
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+const TOTAL_CARDS = 7;
+const answers = {};
+
+// ─── NAVIGATION ──────────────────────────────────────────────────────────────
+function showCard(n) {
+  document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
+  document.getElementById('card-' + n).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.querySelector('.progress-bar-wrap').style.display = n === 0 ? 'none' : 'block';
+  updateProgress(n);
+}
+
+function nextCard(current) {
+  if (current === 0) {
+    const sn = document.getElementById('student-name').value.trim();
+    const cn = document.getElementById('char-name').value.trim();
+    if (!sn || !cn) { alert('Please fill in both names before continuing.'); return; }
+    if (!checkNameInputs()) return;
+  }
+  showCard(current + 1);
+}
+
+function prevCard(current) { showCard(current - 1); }
+
+function updateProgress(cardIndex) {
+  const pct = cardIndex === 0 ? 0 : Math.round((cardIndex / TOTAL_CARDS) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = cardIndex === 0 ? '' : pct + '%';
+  document.getElementById('progress-label').textContent = cardIndex === 0 ? '' : 'Question ' + cardIndex + ' of ' + TOTAL_CARDS;
+}
+
+function selectChoice(qId, idx, villain) {
+  const container = document.getElementById(qId);
+  container.querySelectorAll('.choice-btn').forEach((btn, i) => btn.classList.toggle('selected', i === idx));
+  answers[qId] = { idx, villain };
+  const nextBtn = document.getElementById('next-' + parseInt(qId.replace('q', '')));
+  if (nextBtn) nextBtn.disabled = false;
+}
+
+function getDominantVillain() {
+  const scores = { scar: 0, ursula: 0, syndrome: 0, gaston: 0, maleficent: 0, yzma: 0 };
+  Object.values(answers).forEach(a => { if (a && a.villain) scores[a.villain]++; });
+  return Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0];
+}
+
+// ─── RESULT PROFILES ─────────────────────────────────────────────────────────
+const profiles = {
+  scar: {
+    emoji: '🦁',
+    movie: 'The Lion King · Disney',
+    name: 'Scar Energy',
+    subtitle: 'Patient. Calculated. Always three moves ahead.',
+    cardClass: 'villain-scar',
+    summary: (name) => `${name} has Scar energy — which means they are playing a game most people around them don't even realize is happening. They're patient in a way that's almost eerie. While everyone else reacts to what's in front of them, ${name} is thinking about what comes next, and the move after that, and the one after that. They're charming when they need to be, quiet when that works better, and they rarely show their hand before the moment is right. The thing about Scar energy is that it's not evil by default — it's strategic. A character with this energy protecting the right things or fighting for a real cause is genuinely formidable. Their weakness is the waiting: sometimes the plan takes so long that they lose perspective on why they wanted it in the first place.`,
+    tip: 'Write your character in a moment where they have to act before the plan is ready — where something forces their hand early. That\'s when the mask slips and we see who they really are underneath the strategy.'
+  },
+  ursula: {
+    emoji: '🐙',
+    movie: 'The Little Mermaid · Disney',
+    name: 'Ursula Energy',
+    subtitle: 'Bold. Theatrical. Knows exactly what she\'s worth.',
+    cardClass: 'villain-ursula',
+    summary: (name) => `${name} has Ursula energy — and that means they walk into every room like they own it, because as far as they're concerned, they do. This is a character who knows their own power and has zero interest in pretending otherwise. They're dramatic in the best possible way, bigger than life, and utterly convinced that the world should be paying more attention to them than it currently is. Ursula energy isn\'t insecure — it\'s the opposite. ${name} knows exactly what they bring to the table and they're not going to shrink for anyone. Their deals are real, their confidence is genuine, and when they finally get their moment in the spotlight, they absolutely deliver. Their weakness is that the performance can become more important than the goal.`,
+    tip: 'Give your character a moment where they\'re completely alone — no audience, no performance, no one to impress. What do they do? Who are they when nobody\'s watching? That\'s the scene that makes them real.'
+  },
+  syndrome: {
+    emoji: '⚡',
+    movie: 'The Incredibles · Pixar',
+    name: 'Syndrome Energy',
+    subtitle: 'Driven. Brilliant. Fueled by something that happened a long time ago.',
+    cardClass: 'villain-syndrome',
+    summary: (name) => `${name} has Syndrome energy — and underneath everything they do, there is a wound. Someone told them no. Someone said they didn\'t belong, didn\'t have what it took, weren\'t the right kind of person. And instead of letting that go, ${name} turned it into rocket fuel. The ambition is real. The talent is real. The drive is absolutely real. What makes this character fascinating is the question of whether the thing they\'re building is actually for them — or whether it\'s still aimed at proving something to a person who probably doesn\'t even remember the moment that changed everything. Their energy is unstoppable when it\'s pointed at the right things. Their danger is when the goal becomes about revenge instead of creation.`,
+    tip: 'Write the scene from before — the moment someone dismissed your character, underestimated them, or shut the door. Don\'t explain it. Just show it. The reader will understand everything about who they became.'
+  },
+  gaston: {
+    emoji: '💪',
+    movie: 'Beauty and the Beast · Disney',
+    name: 'Gaston Energy',
+    subtitle: 'Confident. Loud. Genuinely doesn\'t understand why this isn\'t working.',
+    cardClass: 'villain-gaston',
+    summary: (name) => `${name} has Gaston energy — which means their confidence is so complete and so genuine that it almost loops back around to being endearing. They are not pretending to think they\'re great. They actually think they\'re great. They have always been the best at things, they have always been admired, and it has simply never occurred to them that any given situation might go differently. Gaston energy in a character is comedy and tragedy at the same time — hilarious when things are going well, genuinely heartbreaking when reality finally shows up and doesn\'t cooperate with the narrative they\'ve built. Their writing opportunity is the moment they face something they can\'t win with confidence alone, and whether they grow from it or double down.`,
+    tip: 'Write your character failing at something in front of people — and show their internal reaction honestly. Do they double down? Do they finally crack? That moment of reckoning is the most interesting thing you can do with this energy.'
+  },
+  maleficent: {
+    emoji: '🌿',
+    movie: 'Sleeping Beauty · Disney',
+    name: 'Maleficent Energy',
+    subtitle: 'Powerful. Principled. Loyal to their own code above everything.',
+    cardClass: 'villain-maleficent',
+    summary: (name) => `${name} has Maleficent energy — which means they operate by their own code, they take their commitments seriously, and they do not forgive betrayal easily. This is a character who was wronged. Maybe once, maybe more than once. And instead of moving on in the way people kept suggesting they should, they made a decision: never again. The walls went up. The circle got small. And the people inside that circle get everything — fierce loyalty, real protection, genuine care. The people outside it get the cold version, the guarded version, the one that doesn\'t let anyone close. What makes Maleficent energy so compelling on the page is the question of who finally gets through — and what it costs both of them.`,
+    tip: 'Write the moment your character decides to let someone in — not dramatically, not on purpose, just the tiny moment where the wall comes down a little without them planning it. That\'s their whole story in one scene.'
+  },
+  yzma: {
+    emoji: '💜',
+    movie: 'The Emperor\'s New Groove · Disney',
+    name: 'Yzma Energy',
+    subtitle: 'Unpredictable. Extra. The plan changes. The chaos doesn\'t.',
+    cardClass: 'villain-yzma',
+    summary: (name) => `${name} has Yzma energy — and that means any plan involving them is going to go sideways at least once, in a direction nobody expected, and somehow end up somewhere interesting. This character is theatrical, creative, a little chaotic, and absolutely convinced that their approach is correct even when all evidence suggests otherwise. Yzma energy isn\'t stupid — it\'s actually quite clever. It just operates on a frequency that other characters find difficult to track. They come up with solutions nobody else would think of because nobody else thinks the way they do. They make everything more dramatic than it needs to be because everything feels important to them. Their weakness is that the chaos can become the point instead of the means, and they lose the thread of what they were actually trying to do.`,
+    tip: 'Let your character\'s plan go completely off the rails — and show them adapting in real time, getting more creative and more chaotic as it falls apart. That improvisation is where their best moments live.'
+  }
+};
+
+// ─── GENERATE RESULT ─────────────────────────────────────────────────────────
+function generateResult() {
+  const villain = getDominantVillain();
+  const profile = profiles[villain];
+  const charName = document.getElementById('char-name').value.trim() || 'Your character';
+  const studentName = document.getElementById('student-name').value.trim();
+
+  document.getElementById('res-student-label').textContent = studentName ? `${studentName}'s character` : 'Character Profile';
+  document.getElementById('res-emoji').textContent = profile.emoji;
+  document.getElementById('res-movie').textContent = profile.movie;
+  document.getElementById('res-type').textContent = profile.name;
+  document.getElementById('res-subtitle').textContent = profile.subtitle;
+  document.getElementById('res-summary').textContent = profile.summary(charName);
+  document.getElementById('res-writing-tip').textContent = profile.tip;
+
+  const card = document.getElementById('result-card');
+  card.className = 'result-card ' + profile.cardClass;
+  document.getElementById('res-divider').className = 'result-divider ' + profile.cardClass;
+
+  document.querySelector('.progress-bar-wrap').style.display = 'block';
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('progress-pct').textContent = '100%';
+  document.getElementById('progress-label').textContent = 'Villain Revealed ✦';
+
+  setTimeout(() => {
+    document.querySelectorAll('.question-card').forEach(c => c.style.display = 'none');
+    document.querySelector('.progress-bar-wrap').style.display = 'none';
+    document.getElementById('result-section').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 700);
+}
+
+function retake() { window.location.reload(); }
+</script>
+</body>
+</html>
