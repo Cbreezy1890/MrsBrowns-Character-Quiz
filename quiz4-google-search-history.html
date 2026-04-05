@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What's Your Character's Unhinged Google Search History?</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f8f9fa;
+    --card: #ffffff;
+    --border: #e0e4e8;
+    --ink: #1a1d21;
+    --accent: #4285f4;
+    --accent2: #ea4335;
+    --accent3: #34a853;
+    --accent4: #fbbc04;
+    --muted: #5f6368;
+    --search-bg: #f1f3f4;
+    --progress-bg: #e0e4e8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Manrope', sans-serif;
+    background-color: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 10% 10%, rgba(66,133,244,0.06) 0%, transparent 45%),
+      radial-gradient(ellipse at 90% 90%, rgba(234,67,53,0.05) 0%, transparent 45%);
+  }
+
+  .container { max-width: 680px; margin: 0 auto; padding: 44px 24px 80px; }
+
+  .quiz-header { text-align: center; margin-bottom: 44px; animation: fadeDown 0.7s ease both; }
+
+  .google-logo {
+    font-family: 'Manrope', sans-serif;
+    font-size: 2rem; font-weight: 800; letter-spacing: -0.02em;
+    margin-bottom: 16px; display: block;
+  }
+  .google-logo .g1 { color: var(--accent); }
+  .google-logo .g2 { color: var(--accent2); }
+  .google-logo .g3 { color: var(--accent4); }
+  .google-logo .g4 { color: var(--accent); }
+  .google-logo .g5 { color: var(--accent3); }
+  .google-logo .g6 { color: var(--accent2); }
+
+  .quiz-header .eyebrow {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 12px;
+  }
+
+  .quiz-header h1 {
+    font-family: 'Manrope', sans-serif;
+    font-size: clamp(1.6rem, 5vw, 2.4rem);
+    font-weight: 800; line-height: 1.2; color: var(--ink); margin-bottom: 14px;
+  }
+
+  .quiz-header h1 span { color: var(--accent2); }
+
+  .fake-searchbar {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 999px; padding: 12px 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    margin: 20px auto; max-width: 460px; text-align: left;
+  }
+
+  .fake-searchbar .search-icon { font-size: 18px; color: var(--muted); flex-shrink: 0; }
+
+  .fake-searchbar .search-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px; color: var(--muted); flex: 1;
+    overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  }
+
+  .fake-searchbar .cursor {
+    width: 2px; height: 16px; background: var(--accent);
+    display: inline-block; animation: blink 1s infinite;
+    margin-left: 2px; flex-shrink: 0;
+  }
+
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+  .quiz-header p {
+    font-size: 16px; color: var(--muted); font-weight: 500;
+    max-width: 460px; margin: 0 auto; line-height: 1.7;
+  }
+
+  .progress-bar-wrap { margin-bottom: 32px; }
+  .progress-meta {
+    display: flex; justify-content: space-between; font-size: 12px;
+    color: var(--muted); margin-bottom: 8px; font-weight: 600; letter-spacing: 0.05em;
+  }
+  .progress-bar { height: 4px; background: var(--progress-bg); border-radius: 2px; overflow: hidden; }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent3), var(--accent2));
+    border-radius: 2px; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .question-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 32px; margin-bottom: 20px; display: none;
+    animation: fadeUp 0.45s ease both;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+  }
+  .question-card.active { display: block; }
+
+  .section-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
+  }
+
+  .question-emoji { font-size: 2rem; display: block; margin-bottom: 10px; }
+
+  .question-text {
+    font-family: 'Manrope', sans-serif;
+    font-size: 1.3rem; font-weight: 800; line-height: 1.4;
+    color: var(--ink); margin-bottom: 24px;
+  }
+
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+
+  .choice-btn {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px 18px; border: 1.5px solid var(--border); border-radius: 12px;
+    background: transparent; cursor: pointer; font-family: 'Manrope', sans-serif;
+    font-size: 16px; font-weight: 500; color: var(--ink); text-align: left;
+    transition: all 0.2s ease; line-height: 1.5;
+  }
+
+  .choice-btn:hover { border-color: var(--accent); background: rgba(66,133,244,0.04); transform: translateX(3px); }
+  .choice-btn.selected { border-color: var(--accent); background: rgba(66,133,244,0.06); }
+
+  .choice-emoji { font-size: 1.4rem; flex-shrink: 0; line-height: 1.3; }
+  .choice-text { flex: 1; }
+  .choice-title { font-weight: 700; color: var(--ink); display: block; margin-bottom: 3px; font-size: 16px; }
+  .choice-sub { font-size: 14px; font-weight: 500; color: var(--muted); display: block; }
+
+  .input-group { margin-bottom: 20px; }
+  .input-group label {
+    display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+  }
+  .input-group input {
+    width: 100%; padding: 13px 16px; border: 1.5px solid var(--border);
+    border-radius: 10px; font-family: 'Manrope', sans-serif; font-size: 15px;
+    font-weight: 500; color: var(--ink); background: var(--bg);
+    outline: none; transition: border-color 0.2s;
+  }
+  .input-group input:focus { border-color: var(--accent); }
+  .input-group input::placeholder { color: var(--muted); }
+
+  .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; gap: 12px; }
+
+  .btn {
+    padding: 13px 28px; border-radius: 10px; font-family: 'Manrope', sans-serif;
+    font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s ease;
+  }
+
+  .btn-primary { background: var(--accent); color: white; box-shadow: 0 4px 14px rgba(66,133,244,0.3); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(66,133,244,0.4); background: #3370d4; }
+  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .btn-ghost { background: transparent; color: var(--muted); border: 1.5px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--muted); color: var(--ink); }
+
+  .btn-submit {
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    color: white; width: 100%; padding: 18px; font-size: 15px; font-weight: 800;
+    border-radius: 12px; box-shadow: 0 6px 20px rgba(66,133,244,0.3); margin-top: 28px;
+  }
+  .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(66,133,244,0.4); }
+
+  #result-section { display: none; animation: fadeUp 0.6s ease both; }
+
+  .result-card {
+    background: var(--card); border: 1.5px solid var(--border); border-radius: 20px;
+    padding: 48px 36px; text-align: center;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.1);
+  }
+
+  .result-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .result-emoji { font-size: 3.5rem; display: block; margin-bottom: 16px; }
+
+  .result-history-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+    text-align: left; max-width: 500px; margin-left: auto; margin-right: auto;
+  }
+
+  .result-searches {
+    display: flex; flex-direction: column; gap: 6px;
+    margin: 0 auto 24px; max-width: 500px;
+  }
+
+  .result-search-item {
+    background: var(--search-bg); border-radius: 8px; padding: 10px 14px;
+    font-family: 'Space Mono', monospace; font-size: 12px;
+    color: var(--accent); text-align: left; display: flex; align-items: flex-start; gap: 10px;
+    line-height: 1.5;
+  }
+
+  .result-search-item .search-icon-sm { flex-shrink: 0; opacity: 0.5; font-size: 13px; margin-top: 1px; }
+
+  .result-type {
+    font-family: 'Manrope', sans-serif;
+    font-size: clamp(1.6rem, 4.5vw, 2.2rem);
+    font-weight: 800; color: var(--ink); margin-bottom: 6px; line-height: 1.2;
+  }
+
+  .result-subtitle { font-size: 15px; font-weight: 600; color: var(--muted); margin-bottom: 28px; }
+
+  .result-divider {
+    width: 60px; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent3), var(--accent2), var(--accent4));
+    margin: 0 auto 28px; border-radius: 2px;
+  }
+
+  .result-summary { font-size: 15px; line-height: 1.85; color: var(--ink); text-align: left; margin-bottom: 28px; font-weight: 500; }
+
+  .result-reflection {
+    background: var(--search-bg); border-left: 3px solid var(--accent);
+    border-radius: 0 12px 12px 0; padding: 18px 20px; text-align: left;
+    font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 32px; font-weight: 500;
+  }
+  .result-reflection strong { color: var(--accent3); display: block; margin-bottom: 6px; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; }
+
+  .btn-retake {
+    background: transparent; border: 1.5px solid var(--border); color: var(--muted);
+    font-size: 13px; font-weight: 700; padding: 11px 24px; border-radius: 10px;
+    cursor: pointer; font-family: 'Manrope', sans-serif; transition: all 0.2s;
+  }
+  .btn-retake:hover { border-color: var(--accent); color: var(--accent); }
+
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 480px) {
+    .container { padding: 28px 16px 60px; }
+    .question-card { padding: 24px 18px; }
+    .result-card { padding: 36px 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="quiz-header">
+    <span class="google-logo">
+      <span class="g1">G</span><span class="g2">o</span><span class="g3">o</span><span class="g4">g</span><span class="g5">l</span><span class="g6">e</span>
+    </span>
+    <p class="eyebrow">🔍 Character Study</p>
+    <h1>What's Your Character's <span>Unhinged Search History?</span></h1>
+    <div class="fake-searchbar">
+      <span class="search-icon">🔍</span>
+      <span class="search-text">answer as your character, not yourself...</span>
+      <span class="cursor"></span>
+    </div>
+    <p>Their browser history reveals everything. Answer as your character — not yourself. What do they Google when nobody's watching?</p>
+  </header>
+
+  <div class="progress-bar-wrap" style="display:none;">
+    <div class="progress-meta">
+      <span id="progress-label"></span>
+      <span id="progress-pct"></span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+
+  <!-- CARD 0 -->
+  <div class="question-card active" id="card-0">
+    <div class="section-label">Let's Begin 🔍</div>
+    <p class="question-text">First, tell us a little about who we're working with.</p>
+    <div class="input-group">
+      <label>Your Name (Student)</label>
+      <input type="text" id="student-name" placeholder="Your first and last name" />
+    </div>
+    <div class="input-group">
+      <label>Your Character's Name</label>
+      <input type="text" id="char-name" placeholder="What is your character called?" />
+    </div>
+    <div class="nav-row">
+      <span></span>
+      <button class="btn btn-primary" onclick="nextCard(0)">Start Searching 🔍</button>
+    </div>
+  </div>
+
+  <!-- Q1 -->
+  <div class="question-card" id="card-1">
+    <div class="section-label">Question 1 of 7</div>
+    <span class="question-emoji">🌙</span>
+    <p class="question-text">It's late and your character can't sleep. What's going through their head?</p>
+    <div class="choices" id="q1">
+      <button class="choice-btn" onclick="selectChoice('q1',0,'overthinker')">
+        <span class="choice-emoji">😰</span><span class="choice-text">
+        <span class="choice-title">Something they said earlier that might have sounded weird</span>
+        <span class="choice-sub">It replays. It always replays. There's no off switch.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',1,'curious')">
+        <span class="choice-emoji">🤔</span><span class="choice-text">
+        <span class="choice-title">A totally random question that has nothing to do with anything</span>
+        <span class="choice-sub">Why DO cats purr? Someone has to find out tonight.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',2,'soft')">
+        <span class="choice-emoji">💭</span><span class="choice-text">
+        <span class="choice-title">Someone they care about — just hoping they're doing okay</span>
+        <span class="choice-sub">Not in a weird way. Just quietly. Always.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',3,'schemer')">
+        <span class="choice-emoji">💡</span><span class="choice-text">
+        <span class="choice-title">An idea they want to make happen — running through how it could work</span>
+        <span class="choice-sub">They can't stop thinking about it. It just keeps getting better in their head.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',4,'improver')">
+        <span class="choice-emoji">🏆</span><span class="choice-text">
+        <span class="choice-title">Something they want to be really good at — picturing themselves doing it</span>
+        <span class="choice-sub">They can see the version of themselves they're working toward. It keeps them up.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(1)">← Back</button>
+      <button class="btn btn-primary" id="next-1" onclick="nextCard(1)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="question-card" id="card-2">
+    <div class="section-label">Question 2 of 7</div>
+    <span class="question-emoji">😬</span>
+    <p class="question-text">Your character just did something slightly embarrassing in front of people. Their first move is...</p>
+    <div class="choices" id="q2">
+      <button class="choice-btn" onclick="selectChoice('q2',0,'overthinker')">
+        <span class="choice-emoji">🌀</span><span class="choice-text">
+        <span class="choice-title">Replaying it on a loop — did everyone notice?</span>
+        <span class="choice-sub">They noticed. Everyone noticed. (They didn't notice.)</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',1,'curious')">
+        <span class="choice-emoji">😂</span><span class="choice-text">
+        <span class="choice-title">Laughing about it out loud — immediately, maybe too hard</span>
+        <span class="choice-sub">If you make the joke first, nobody else can.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',2,'soft')">
+        <span class="choice-emoji">👀</span><span class="choice-text">
+        <span class="choice-title">Checking if it made anyone else feel weird before worrying about themselves</span>
+        <span class="choice-sub">Their own embarrassment comes second to everyone else's feelings.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',3,'schemer')">
+        <span class="choice-emoji">😑</span><span class="choice-text">
+        <span class="choice-title">Going quiet and making a mental note — that's not happening again</span>
+        <span class="choice-sub">They remember things like this. They learn from them.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',4,'improver')">
+        <span class="choice-emoji">🔄</span><span class="choice-text">
+        <span class="choice-title">Immediately thinking about what they should have done differently</span>
+        <span class="choice-sub">Every mistake is a chance to do better next time.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(2)">← Back</button>
+      <button class="btn btn-primary" id="next-2" onclick="nextCard(2)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="question-card" id="card-3">
+    <div class="section-label">Question 3 of 7</div>
+    <span class="question-emoji">🆓</span>
+    <p class="question-text">Your character has totally free time and zero plans. What do they actually do?</p>
+    <div class="choices" id="q3">
+      <button class="choice-btn" onclick="selectChoice('q3',0,'overthinker')">
+        <span class="choice-emoji">😐</span><span class="choice-text">
+        <span class="choice-title">Feel weirdly guilty — like they're definitely forgetting something</span>
+        <span class="choice-sub">Free time feels like a trick. What are they missing?</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',1,'curious')">
+        <span class="choice-emoji">🎲</span><span class="choice-text">
+        <span class="choice-title">Try something random they've never done before just to see what happens</span>
+        <span class="choice-sub">Open schedule, open mind. Let's find out.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',2,'soft')">
+        <span class="choice-emoji">💌</span><span class="choice-text">
+        <span class="choice-title">Reach out to someone they've been meaning to check on</span>
+        <span class="choice-sub">They've been thinking about them. Now they finally have time.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',3,'schemer')">
+        <span class="choice-emoji">🗓️</span><span class="choice-text">
+        <span class="choice-title">Start quietly planning something they've been thinking about for a while</span>
+        <span class="choice-sub">They've had an idea in the back of their head. Time to figure it out.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',4,'improver')">
+        <span class="choice-emoji">🎯</span><span class="choice-text">
+        <span class="choice-title">Practice or work on something they really want to get good at</span>
+        <span class="choice-sub">This is actually the perfect chance. They're not wasting it.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(3)">← Back</button>
+      <button class="btn btn-primary" id="next-3" onclick="nextCard(3)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="question-card" id="card-4">
+    <div class="section-label">Question 4 of 7</div>
+    <span class="question-emoji">👀</span>
+    <p class="question-text">Your character notices someone nearby is having a really bad day. What do they do?</p>
+    <div class="choices" id="q4">
+      <button class="choice-btn" onclick="selectChoice('q4',0,'overthinker')">
+        <span class="choice-emoji">😟</span><span class="choice-text">
+        <span class="choice-title">Wants to say something but talks themselves out of it three times</span>
+        <span class="choice-sub">What if they make it worse? What if it's not their place?</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',1,'curious')">
+        <span class="choice-emoji">🤨</span><span class="choice-text">
+        <span class="choice-title">Gets curious about what's going on and tries to figure it out</span>
+        <span class="choice-sub">People are interesting. Especially when something's clearly up.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',2,'soft')">
+        <span class="choice-emoji">🫶</span><span class="choice-text">
+        <span class="choice-title">Goes over, asks if they're okay, and actually means it</span>
+        <span class="choice-sub">They can't just walk past someone who looks like that.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',3,'schemer')">
+        <span class="choice-emoji">🧠</span><span class="choice-text">
+        <span class="choice-title">Watches quietly and thinks about whether there's something useful they could do</span>
+        <span class="choice-sub">They notice. They just think before they act.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',4,'improver')">
+        <span class="choice-emoji">🛠️</span><span class="choice-text">
+        <span class="choice-title">Offers to help with something specific — not just "are you okay"</span>
+        <span class="choice-sub">Sympathy is fine. Actually doing something is better.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(4)">← Back</button>
+      <button class="btn btn-primary" id="next-4" onclick="nextCard(4)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="question-card" id="card-5">
+    <div class="section-label">Question 5 of 7</div>
+    <span class="question-emoji">💬</span>
+    <p class="question-text">Your character gets into an argument with someone. After it's over, they...</p>
+    <div class="choices" id="q5">
+      <button class="choice-btn" onclick="selectChoice('q5',0,'overthinker')">
+        <span class="choice-emoji">😩</span><span class="choice-text">
+        <span class="choice-title">Replay everything they should have said — perfectly, way too late</span>
+        <span class="choice-sub">The perfect comeback always shows up an hour later.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',1,'curious')">
+        <span class="choice-emoji">🤷</span><span class="choice-text">
+        <span class="choice-title">Get completely distracted by something else within five minutes</span>
+        <span class="choice-sub">Life is short. More interesting things are happening.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',2,'soft')">
+        <span class="choice-emoji">🥺</span><span class="choice-text">
+        <span class="choice-title">Immediately wonder if the other person is okay — even if they were right</span>
+        <span class="choice-sub">They feel bad. They always feel bad. Even when it wasn't their fault.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',3,'schemer')">
+        <span class="choice-emoji">🗺️</span><span class="choice-text">
+        <span class="choice-title">Think through what they actually wanted out of it and how to get there</span>
+        <span class="choice-sub">Arguments are problems. Problems have solutions.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',4,'improver')">
+        <span class="choice-emoji">📓</span><span class="choice-text">
+        <span class="choice-title">Think honestly about what they could have done better — even if they weren't wrong</span>
+        <span class="choice-sub">There's always something to learn. Even from a win.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(5)">← Back</button>
+      <button class="btn btn-primary" id="next-5" onclick="nextCard(5)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="question-card" id="card-6">
+    <div class="section-label">Question 6 of 7</div>
+    <span class="question-emoji">🪞</span>
+    <p class="question-text">Be honest. What does your character wish they were better at?</p>
+    <div class="choices" id="q6">
+      <button class="choice-btn" onclick="selectChoice('q6',0,'overthinker')">
+        <span class="choice-emoji">😌</span><span class="choice-text">
+        <span class="choice-title">Not worrying so much about what everyone thinks of them</span>
+        <span class="choice-sub">They know it shouldn't matter this much. It does anyway.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',1,'curious')">
+        <span class="choice-emoji">🎯</span><span class="choice-text">
+        <span class="choice-title">Actually finishing things instead of starting five new ones</span>
+        <span class="choice-sub">The ideas are great. The follow-through is... a work in progress.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',2,'soft')">
+        <span class="choice-emoji">🗣️</span><span class="choice-text">
+        <span class="choice-title">Asking for help when they need it instead of just handling everything alone</span>
+        <span class="choice-sub">They're great at being there for others. Not so great at letting people be there for them.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',3,'schemer')">
+        <span class="choice-emoji">🤝</span><span class="choice-text">
+        <span class="choice-title">Trusting people — like actually trusting them, not just acting like it</span>
+        <span class="choice-sub">They want to. It just doesn't come naturally.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',4,'improver')">
+        <span class="choice-emoji">⏸️</span><span class="choice-text">
+        <span class="choice-title">Being okay when something isn't perfect yet</span>
+        <span class="choice-sub">They know good enough exists. They just can't seem to stop there.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(6)">← Back</button>
+      <button class="btn btn-primary" id="next-6" onclick="nextCard(6)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="question-card" id="card-7">
+    <div class="section-label">Question 7 of 7</div>
+    <span class="question-emoji">⭐</span>
+    <p class="question-text">Last one. What does your character want most that they'd never just come out and say?</p>
+    <div class="choices" id="q7">
+      <button class="choice-btn" onclick="selectChoice('q7',0,'overthinker')">
+        <span class="choice-emoji">🕊️</span><span class="choice-text">
+        <span class="choice-title">To stop second-guessing themselves — just once, to feel sure about something</span>
+        <span class="choice-sub">The noise in their head is exhausting. They want it to quiet down.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',1,'curious')">
+        <span class="choice-emoji">🌍</span><span class="choice-text">
+        <span class="choice-title">For the world to stay as interesting tomorrow as it is today</span>
+        <span class="choice-sub">Boredom is the real enemy. Everything else is manageable.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',2,'soft')">
+        <span class="choice-emoji">🫂</span><span class="choice-text">
+        <span class="choice-title">For someone to take care of them the way they take care of everyone else</span>
+        <span class="choice-sub">They'd never ask for it. But they notice when it doesn't happen.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',3,'schemer')">
+        <span class="choice-emoji">🏆</span><span class="choice-text">
+        <span class="choice-title">To pull off the thing they've been planning — and have it actually work</span>
+        <span class="choice-sub">The idea is good. They just need the right moment.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',4,'improver')">
+        <span class="choice-emoji">✅</span><span class="choice-text">
+        <span class="choice-title">To feel like they're actually good enough — not almost, not getting there, but enough</span>
+        <span class="choice-sub">The bar keeps moving. They keep chasing it. They're tired but won't stop.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(7)">← Back</button>
+      <span></span>
+    </div>
+    <button class="btn btn-submit" onclick="generateResult()">🔍 Reveal Their Search History →</button>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-section">
+    <div class="result-card">
+      <p class="result-eyebrow" id="res-student-label"></p>
+      <span class="result-emoji" id="res-emoji"></span>
+      <p class="result-history-label">🕐 Recent Search History</p>
+      <div class="result-searches" id="res-searches"></div>
+      <h2 class="result-type" id="res-type"></h2>
+      <p class="result-subtitle" id="res-subtitle"></p>
+      <div class="result-divider"></div>
+      <p class="result-summary" id="res-summary"></p>
+      <div class="result-reflection">
+        <strong>✍️ Writing Tip</strong>
+        <span id="res-writing-tip"></span>
+      </div>
+      <button class="btn-retake" onclick="retake()">↩ Start Over</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const wholeWordOnly = ['damn','dammit','hell','crap','dick','homo','jerk','piss','sex','cum','fag','hoe','spic','rape','porn','tits','cock'];
+const substringMatch = ['ass','asses','asshole','assholes','bastard','bitch','bitches','bullshit','cunt','cunts','dickhead','douche','douchebag','faggot','faggots','fuck','fucked','fucker','fuckers','fucking','fucks','jackass','motherfucker','motherfuckers','nigga','nigger','niggers','pissed','prick','pricks','pussy','pussies','retard','retarded','shit','shits','shitty','skank','slut','sluts','twat','twats','whore','whores','wtf','ballsack','blowjob','boner','butthole','chink','clit','clits','cocks','dildo','dyke','erection','handjob','jizz','kike','lesbo','molest','orgasm','penis','pervert','porno','prostitute','rapist','screwing','shag','spank','testicle','tranny','vagina','wank','wanker','fuckface','dipshit','numbnuts','scrotum','shitheads','suckmy','jackoff','jackoffs'];
+
+function containsBadWord(input) {
+  const cleaned = input.toLowerCase().replace(/[^a-z]/g, ' ').trim();
+  const words = cleaned.split(/\s+/);
+  if (words.some(w => wholeWordOnly.includes(w))) return true;
+  if (substringMatch.some(bad => cleaned.replace(/\s/g,'').includes(bad) || cleaned.includes(bad))) return true;
+  return false;
+}
+function showWarning(inputEl) {
+  const existing = inputEl.parentNode.querySelector('.filter-warning');
+  if (existing) existing.remove();
+  inputEl.style.borderColor = 'var(--accent2)';
+  inputEl.value = '';
+  const warning = document.createElement('p');
+  warning.className = 'filter-warning';
+  warning.style.cssText = 'margin-top:8px;font-size:13px;font-weight:700;color:var(--accent2);';
+  warning.textContent = '✋ Make better choices! — Mrs. Brown';
+  inputEl.parentNode.appendChild(warning);
+  setTimeout(() => { warning.remove(); inputEl.style.borderColor = 'var(--border)'; }, 3500);
+}
+function checkNameInputs() {
+  const s = document.getElementById('student-name');
+  const c = document.getElementById('char-name');
+  let clean = true;
+  if (containsBadWord(s.value)) { showWarning(s); clean = false; }
+  if (containsBadWord(c.value)) { showWarning(c); clean = false; }
+  return clean;
+}
+
+const TOTAL_CARDS = 7;
+const answers = {};
+
+function showCard(n) {
+  document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
+  document.getElementById('card-' + n).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.querySelector('.progress-bar-wrap').style.display = n === 0 ? 'none' : 'block';
+  updateProgress(n);
+}
+
+function nextCard(current) {
+  if (current === 0) {
+    const sn = document.getElementById('student-name').value.trim();
+    const cn = document.getElementById('char-name').value.trim();
+    if (!sn || !cn) { alert('Please fill in both names before continuing.'); return; }
+    if (!checkNameInputs()) return;
+  }
+  showCard(current + 1);
+}
+
+function prevCard(current) { showCard(current - 1); }
+
+function updateProgress(cardIndex) {
+  const pct = cardIndex === 0 ? 0 : Math.round((cardIndex / TOTAL_CARDS) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = cardIndex === 0 ? '' : pct + '%';
+  document.getElementById('progress-label').textContent = cardIndex === 0 ? '' : 'Question ' + cardIndex + ' of ' + TOTAL_CARDS;
+}
+
+function selectChoice(qId, idx, type) {
+  const container = document.getElementById(qId);
+  container.querySelectorAll('.choice-btn').forEach((btn, i) => btn.classList.toggle('selected', i === idx));
+  answers[qId] = { idx, type };
+  const nextBtn = document.getElementById('next-' + parseInt(qId.replace('q', '')));
+  if (nextBtn) nextBtn.disabled = false;
+}
+
+function getDominantType() {
+  const scores = { overthinker: 0, curious: 0, soft: 0, schemer: 0, improver: 0 };
+  Object.values(answers).forEach(a => { if (a && a.type) scores[a.type]++; });
+  return Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0];
+}
+
+const profiles = {
+  overthinker: {
+    emoji: '🌀',
+    searches: [
+      'is it normal to replay conversations in your head',
+      'what does it mean when someone pauses before answering you',
+      'how to know if everyone secretly hates you but is being polite',
+      'signs you said something weird without realizing',
+      'do other people think this much or is it just me'
+    ],
+    type: 'The Overthinker',
+    subtitle: 'Every search begins with a feeling and ends with more questions.',
+    summary: (name) => `${name}\'s browser history is a window into a mind that never fully stops running. Every interaction gets replayed, every silence gets analyzed, every small moment gets expanded into something worth worrying about. This isn\'t weakness — it\'s a deep awareness of the world that most characters simply don\'t have. The Overthinker notices things others miss, reads rooms other characters walk through blind, and feels the weight of every moment fully. Their weakness is that awareness becomes burden: the same sensitivity that makes them perceptive makes them exhausted. The writing opportunity is the moment ${name} learns to trust their gut instead of interrogating it — when awareness becomes instinct rather than anxiety.`,
+    tip: 'Write your character making a fast, instinctive decision — no deliberation, no second-guessing. Then show them being right. Let them surprise themselves with what they already knew.'
+  },
+  curious: {
+    emoji: '🐇',
+    searches: [
+      'can you train a raccoon (asking for a character)',
+      'why do we yawn when we see someone else yawn',
+      'deepest hole ever dug what did they find down there',
+      'what would happen if everyone on earth jumped at the same time',
+      'do fish get bored'
+    ],
+    type: 'The Chaotic Curious',
+    subtitle: 'One tab. Then forty tabs. Then somehow: raccoons.',
+    summary: (name) => `${name}\'s search history is a crime scene with no clear motive and raccoons somewhere near the end. One question leads to another, which leads somewhere completely unrelated, which turns out to be the most interesting place they\'ve been all week. The Chaotic Curious has a mind that refuses to stay in one lane — they follow curiosity without apology, make unexpected connections between wildly different things, and bring energy into every situation that nobody quite planned for. Their weakness is that boundless curiosity can become scattered energy — forty open tabs is a very creative form of avoidance. The writing opportunity is the moment ${name}\'s weird, unexpected thinking solves something nobody else could have cracked, and they realize the scattered path was leading somewhere all along.`,
+    tip: 'Give your character a moment where their random, weird knowledge becomes the exact thing that saves the situation. Let the chaos be the superpower.'
+  },
+  soft: {
+    emoji: '💝',
+    searches: [
+      'how to tell someone you miss them without being weird about it',
+      'do dogs actually know when you\'re sad',
+      'thoughtful things to do for someone having a hard time',
+      'how to make someone feel less alone',
+      'signs someone considers you their person'
+    ],
+    type: 'The Secretly Soft',
+    subtitle: 'Always researching how to make someone else\'s day a little better.',
+    summary: (name) => `${name}\'s browser history is full of other people. Every search leads back to someone — how to help them, how to understand them better, how to show them they matter without making it weird. The Secretly Soft character is the one other characters don\'t realize they depend on until something goes wrong and ${name} isn\'t there. They notice everything. They remember everything. They show up quietly and consistently for the people in their life without needing credit. Their weakness is that this kind of care can become self-erasure — always researching everyone else\'s needs while their own go unaddressed and unasked for. The writing opportunity is the moment someone finally turns that care back toward ${name} and asks how they\'re doing. And actually means it.`,
+    tip: 'Write a scene where someone does something specifically and thoughtfully for your character — something that shows they\'ve been paying attention. Watch how your character reacts. That reaction tells you everything.'
+  },
+  schemer: {
+    emoji: '♟️',
+    searches: [
+      'how to negotiate anything and actually win',
+      'psychological principles that work on most people',
+      'how to accurately read someone\'s real intentions',
+      'what makes people trust you faster',
+      'how to be the most prepared person in any room'
+    ],
+    type: 'The Bold Schemer',
+    subtitle: 'Every search is intelligence gathering. Every answer is leverage.',
+    summary: (name) => `${name}\'s browser history reads like a preparation manual. Every search is building toward something — understanding people better, gaining advantage, positioning themselves for what comes next. The Bold Schemer is not villainous by default. They\'re strategic. They see angles other characters miss, think several moves ahead, and treat information like the resource it actually is. What makes this character compelling is the question underneath all the strategy: what are they actually trying to protect, and for whom? Because the Schemer always has a reason — and it\'s rarely just themselves. Their weakness is that constant strategy makes genuine connection harder. The writing opportunity is the moment ${name} stops calculating and just reacts, and what that unguarded moment reveals about who they really are.`,
+    tip: 'Write your character in a moment where strategy fails and raw emotion takes over. That unguarded moment is when the reader finally sees who they are underneath all the preparation.'
+  },
+  improver: {
+    emoji: '📈',
+    searches: [
+      'how to get better at everything simultaneously',
+      'morning routines of highly successful people (need data not motivation)',
+      'what actually separates good from great',
+      'how long does it really take to build a habit',
+      'am I improving fast enough (how would you even measure this)'
+    ],
+    type: 'The Relentless Improver',
+    subtitle: 'Somewhere between inspiring and exhausting. Mostly inspiring.',
+    summary: (name) => `${name}\'s browser history is a self-improvement project that never quite ends. Every search is about getting better — at something, at anything, at the version of themselves they can already see but haven\'t fully become yet. The Relentless Improver doesn\'t settle because they genuinely believe that what\'s possible is always a little further than where they are now. This makes them driven, disciplined, and genuinely impressive to watch. Their weakness is the bar that keeps moving — the standard keeps rising, and rest starts to feel like falling behind. The writing opportunity is the moment ${name} realizes that who they already are might be exactly what someone else needs, right now, without any more improvement required.`,
+    tip: 'Write your character receiving genuine appreciation for who they already are — not what they\'ve accomplished or what they\'re working toward. Show us what they do with it. That moment is everything.'
+  }
+};
+
+function generateResult() {
+  const type = getDominantType();
+  const profile = profiles[type];
+  const charName = document.getElementById('char-name').value.trim() || 'Your character';
+  const studentName = document.getElementById('student-name').value.trim();
+
+  document.getElementById('res-student-label').textContent = studentName ? `${studentName}'s character` : 'Character Profile';
+  document.getElementById('res-emoji').textContent = profile.emoji;
+  document.getElementById('res-type').textContent = profile.type;
+  document.getElementById('res-subtitle').textContent = profile.subtitle;
+  document.getElementById('res-summary').textContent = profile.summary(charName);
+  document.getElementById('res-writing-tip').textContent = profile.tip;
+
+  const searchesEl = document.getElementById('res-searches');
+  searchesEl.innerHTML = '';
+  profile.searches.forEach(s => {
+    const item = document.createElement('div');
+    item.className = 'result-search-item';
+    item.innerHTML = '<span class="search-icon-sm">🔍</span>' + s;
+    searchesEl.appendChild(item);
+  });
+
+  document.querySelector('.progress-bar-wrap').style.display = 'block';
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('progress-pct').textContent = '100%';
+  document.getElementById('progress-label').textContent = 'Search complete 🔍';
+
+  setTimeout(() => {
+    document.querySelectorAll('.question-card').forEach(c => c.style.display = 'none');
+    document.querySelector('.progress-bar-wrap').style.display = 'none';
+    document.getElementById('result-section').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 700);
+}
+
+function retake() { window.location.reload(); }
+</script>
+</body>
+</html>
