@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What Taylor Swift Era Is Your Character In?</title>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,300;0,600;0,700;1,300&family=Libre+Baskerville:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0e0e;
+    --card: #161616;
+    --border: #2a2a2a;
+    --text: #f0ece4;
+    --muted: #8a8480;
+    --accent: #c9a96e;
+    --accent2: #e8d5b0;
+    --progress-bg: #2a2a2a;
+    --glow: rgba(201,169,110,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Josefin Sans', sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 30% 10%, rgba(201,169,110,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 90%, rgba(232,213,176,0.05) 0%, transparent 50%);
+  }
+
+  .container { max-width: 700px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  /* HEADER */
+  .quiz-header { text-align: center; margin-bottom: 48px; animation: fadeDown 0.7s ease both; }
+
+  .quiz-header .eyebrow {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.35em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 16px;
+  }
+
+  .quiz-header h1 {
+    font-family: 'Libre Baskerville', serif;
+    font-size: clamp(1.9rem, 5.5vw, 3rem);
+    font-weight: 700; line-height: 1.15; color: var(--text); margin-bottom: 16px;
+  }
+
+  .quiz-header h1 em { font-style: italic; font-weight: 400; color: var(--accent); }
+
+  .era-ticker {
+    font-size: 13px; font-weight: 700; letter-spacing: 0.2em;
+    color: var(--muted); margin: 14px 0; text-transform: uppercase;
+    font-style: italic;
+  }
+
+  .quiz-header p {
+    font-size: 17px; color: var(--muted); font-weight: 300;
+    max-width: 480px; margin: 0 auto; line-height: 1.85; letter-spacing: 0.02em;
+  }
+
+  /* PROGRESS */
+  .progress-bar-wrap { margin-bottom: 36px; }
+  .progress-meta {
+    display: flex; justify-content: space-between; font-size: 11px;
+    color: var(--muted); margin-bottom: 8px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .progress-bar { height: 3px; background: var(--progress-bg); border-radius: 2px; overflow: hidden; }
+  .progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* CARDS */
+  .question-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 36px 32px; margin-bottom: 20px; display: none;
+    animation: fadeUp 0.45s ease both;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.5);
+  }
+  .question-card.active { display: block; }
+
+  .section-label {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.25em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
+  }
+
+  .question-emoji { font-size: 2rem; display: block; margin-bottom: 12px; }
+
+  .question-text {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.55rem; font-weight: 700; line-height: 1.45;
+    color: var(--text); margin-bottom: 28px;
+  }
+
+  /* TIEBREAKER CARD */
+  .tiebreaker-label {
+    display: inline-block; background: var(--accent); color: var(--bg);
+    font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 4px 12px; border-radius: 999px; margin-bottom: 14px;
+  }
+
+  /* INPUTS */
+  .input-group { margin-bottom: 20px; }
+  .input-group label {
+    display: block; font-size: 10px; font-weight: 600; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+  }
+  .input-group input {
+    width: 100%; padding: 14px 16px; border: 1px solid var(--border);
+    border-radius: 10px; font-family: 'Josefin Sans', sans-serif; font-size: 15px;
+    font-weight: 300; color: var(--text); background: var(--bg);
+    outline: none; transition: border-color 0.2s; letter-spacing: 0.03em;
+  }
+  .input-group input:focus { border-color: var(--accent); }
+  .input-group input::placeholder { color: var(--muted); }
+
+  /* CHOICES */
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+
+  .choice-btn {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px 18px; border: 1px solid var(--border); border-radius: 12px;
+    background: transparent; cursor: pointer; font-family: 'Josefin Sans', sans-serif;
+    font-size: 16px; font-weight: 300; color: var(--text); text-align: left;
+    transition: all 0.2s ease; line-height: 1.6; letter-spacing: 0.02em;
+  }
+
+  .choice-btn:hover { border-color: var(--accent); background: var(--glow); transform: translateX(4px); }
+  .choice-btn.selected { border-color: var(--accent); background: var(--glow); }
+
+  .choice-emoji { font-size: 1.3rem; flex-shrink: 0; line-height: 1.4; }
+  .choice-text { flex: 1; }
+  .choice-title { font-weight: 600; color: var(--text); display: block; margin-bottom: 3px; letter-spacing: 0.03em; }
+  .choice-sub { font-size: 14px; font-weight: 300; color: var(--muted); display: block; letter-spacing: 0.02em; }
+
+  /* THIS OR THAT TIEBREAKER */
+  .thisthat { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .thisthat .choice-btn { justify-content: center; text-align: center; padding: 22px 16px; flex-direction: column; gap: 8px; align-items: center; }
+  .thisthat .choice-emoji { font-size: 1.8rem; }
+  .thisthat .choice-title { font-size: 13px; }
+
+  /* NAV */
+  .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; gap: 12px; }
+
+  .btn {
+    padding: 13px 28px; border-radius: 10px; font-family: 'Josefin Sans', sans-serif;
+    font-size: 13px; font-weight: 700; cursor: pointer; border: none;
+    transition: all 0.2s ease; letter-spacing: 0.08em; text-transform: uppercase;
+  }
+
+  .btn-primary { background: var(--accent); color: var(--bg); box-shadow: 0 4px 16px rgba(201,169,110,0.25); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,169,110,0.35); }
+  .btn-primary:disabled { opacity: 0.25; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--muted); color: var(--text); }
+
+  .btn-submit {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: var(--bg); width: 100%; padding: 18px; font-size: 13px; font-weight: 700;
+    border-radius: 12px; box-shadow: 0 6px 24px rgba(201,169,110,0.3);
+    margin-top: 28px; letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(201,169,110,0.4); }
+
+  /* RESULT */
+  #result-section { display: none; animation: fadeUp 0.6s ease both; }
+
+  .result-card {
+    border-radius: 20px; padding: 52px 40px; text-align: center;
+    box-shadow: 0 12px 60px rgba(0,0,0,0.6);
+    border: 1px solid var(--border);
+  }
+
+  .result-eyebrow {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.3em;
+    text-transform: uppercase; margin-bottom: 14px; opacity: 0.6;
+  }
+
+  .result-emoji { font-size: 3.8rem; display: block; margin-bottom: 18px; }
+
+  .result-year {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.25em;
+    text-transform: uppercase; margin-bottom: 8px; opacity: 0.7;
+  }
+
+  .result-era {
+    font-family: 'Libre Baskerville', serif;
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 700; line-height: 1.15; margin-bottom: 10px;
+  }
+
+  .result-subtitle {
+    font-size: 13px; font-weight: 300; margin-bottom: 32px;
+    letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.7;
+  }
+
+  .result-divider { width: 50px; height: 2px; margin: 0 auto 32px; border-radius: 1px; }
+
+  .result-summary {
+    font-size: 15px; line-height: 1.9; text-align: left;
+    margin-bottom: 28px; font-weight: 300; letter-spacing: 0.01em;
+  }
+
+  .result-reflection {
+    border-left: 2px solid; border-radius: 0 10px 10px 0;
+    padding: 18px 20px; text-align: left; font-size: 14px;
+    line-height: 1.7; margin-bottom: 32px; font-weight: 300;
+  }
+  .result-reflection strong {
+    display: block; margin-bottom: 6px; font-size: 10px;
+    letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700;
+  }
+
+  .btn-retake {
+    background: transparent; font-size: 12px; font-weight: 700; padding: 11px 24px;
+    border-radius: 10px; cursor: pointer; font-family: 'Josefin Sans', sans-serif;
+    transition: all 0.2s; letter-spacing: 0.1em; text-transform: uppercase;
+    border: 1px solid;
+  }
+
+  /* ERA THEMES */
+  .era-debut { background: #fdf6e8; color: #2c1a00; border-color: #e8c878; }
+  .era-debut .result-year, .era-debut .result-eyebrow { color: #8a6820; }
+  .era-debut .result-era { color: #c8860a; }
+  .era-debut .result-divider { background: linear-gradient(90deg, #c8860a, #e8c878); }
+  .era-debut .result-summary { color: #3c2810; }
+  .era-debut .result-reflection { background: rgba(200,134,10,0.08); border-color: #c8860a; color: #6a4820; }
+  .era-debut .result-reflection strong { color: #c8860a; }
+  .era-debut .btn-retake { border-color: #e8c878; color: #8a6820; }
+
+  .era-fearless { background: #fffbf0; color: #2c1a00; border-color: #f0d060; }
+  .era-fearless .result-year, .era-fearless .result-eyebrow { color: #9a7800; }
+  .era-fearless .result-era { color: #d4a000; }
+  .era-fearless .result-divider { background: linear-gradient(90deg, #d4a000, #f0d060); }
+  .era-fearless .result-summary { color: #3c2800; }
+  .era-fearless .result-reflection { background: rgba(212,160,0,0.08); border-color: #d4a000; color: #6a5000; }
+  .era-fearless .result-reflection strong { color: #d4a000; }
+  .era-fearless .btn-retake { border-color: #f0d060; color: #9a7800; }
+
+  .era-speaknow { background: #1a0a2e; color: #f0eaff; border-color: #6a2090; }
+  .era-speaknow .result-year, .era-speaknow .result-eyebrow { color: #c090f0; }
+  .era-speaknow .result-era { color: #d0a0ff; }
+  .era-speaknow .result-divider { background: linear-gradient(90deg, #9040c0, #d0a0ff); }
+  .era-speaknow .result-summary { color: #d8d0f0; }
+  .era-speaknow .result-reflection { background: rgba(160,80,240,0.1); border-color: #9040c0; color: #b090d0; }
+  .era-speaknow .result-reflection strong { color: #d0a0ff; }
+  .era-speaknow .btn-retake { border-color: #6a2090; color: #c090f0; }
+
+  .era-red { background: #1a0000; color: #ffe8e8; border-color: #8a0000; }
+  .era-red .result-year, .era-red .result-eyebrow { color: #ff8080; }
+  .era-red .result-era { color: #ff6060; }
+  .era-red .result-divider { background: linear-gradient(90deg, #cc0000, #ff8080); }
+  .era-red .result-summary { color: #f0d0d0; }
+  .era-red .result-reflection { background: rgba(200,0,0,0.12); border-color: #cc0000; color: #c09090; }
+  .era-red .result-reflection strong { color: #ff6060; }
+  .era-red .btn-retake { border-color: #8a0000; color: #ff8080; }
+
+  .era-1989 { background: #e8f4fc; color: #0a2030; border-color: #80c0e8; }
+  .era-1989 .result-year, .era-1989 .result-eyebrow { color: #2080b0; }
+  .era-1989 .result-era { color: #1870a0; }
+  .era-1989 .result-divider { background: linear-gradient(90deg, #1870a0, #80c0e8); }
+  .era-1989 .result-summary { color: #102030; }
+  .era-1989 .result-reflection { background: rgba(24,112,160,0.08); border-color: #1870a0; color: #406080; }
+  .era-1989 .result-reflection strong { color: #1870a0; }
+  .era-1989 .btn-retake { border-color: #80c0e8; color: #2080b0; }
+
+  .era-reputation { background: #0a0a0a; color: #e0e0e0; border-color: #303030; }
+  .era-reputation .result-year, .era-reputation .result-eyebrow { color: #888; }
+  .era-reputation .result-era { color: #c8c8c8; }
+  .era-reputation .result-divider { background: linear-gradient(90deg, #505050, #c8c8c8); }
+  .era-reputation .result-summary { color: #c0c0c0; }
+  .era-reputation .result-reflection { background: rgba(255,255,255,0.05); border-color: #505050; color: #909090; }
+  .era-reputation .result-reflection strong { color: #aaa; }
+  .era-reputation .btn-retake { border-color: #303030; color: #888; }
+
+  .era-lover { background: #fff0f8; color: #2a0020; border-color: #f0a0d0; }
+  .era-lover .result-year, .era-lover .result-eyebrow { color: #c05090; }
+  .era-lover .result-era { color: #e060a0; }
+  .era-lover .result-divider { background: linear-gradient(90deg, #e060a0, #f0c0e0); }
+  .era-lover .result-summary { color: #3a1030; }
+  .era-lover .result-reflection { background: rgba(224,96,160,0.08); border-color: #e060a0; color: #905070; }
+  .era-lover .result-reflection strong { color: #e060a0; }
+  .era-lover .btn-retake { border-color: #f0a0d0; color: #c05090; }
+
+  .era-folklore { background: #f0f0ec; color: #1a1a18; border-color: #b0b8a8; }
+  .era-folklore .result-year, .era-folklore .result-eyebrow { color: #607058; }
+  .era-folklore .result-era { color: #506048; }
+  .era-folklore .result-divider { background: linear-gradient(90deg, #506048, #b0b8a8); }
+  .era-folklore .result-summary { color: #282820; }
+  .era-folklore .result-reflection { background: rgba(80,96,72,0.08); border-color: #506048; color: #607058; }
+  .era-folklore .result-reflection strong { color: #506048; }
+  .era-folklore .btn-retake { border-color: #b0b8a8; color: #607058; }
+
+  .era-evermore { background: #1a1008; color: #f0e8d8; border-color: #604020; }
+  .era-evermore .result-year, .era-evermore .result-eyebrow { color: #c09060; }
+  .era-evermore .result-era { color: #d4a870; }
+  .era-evermore .result-divider { background: linear-gradient(90deg, #8a5020, #d4a870); }
+  .era-evermore .result-summary { color: #e0d0b8; }
+  .era-evermore .result-reflection { background: rgba(138,80,32,0.15); border-color: #8a5020; color: #b09060; }
+  .era-evermore .result-reflection strong { color: #d4a870; }
+  .era-evermore .btn-retake { border-color: #604020; color: #c09060; }
+
+  .era-midnights { background: #060818; color: #c8d4f0; border-color: #202848; }
+  .era-midnights .result-year, .era-midnights .result-eyebrow { color: #7080c0; }
+  .era-midnights .result-era { color: #8aabf0; }
+  .era-midnights .result-divider { background: linear-gradient(90deg, #2d3561, #8aabf0); }
+  .era-midnights .result-summary { color: #b0c0e0; }
+  .era-midnights .result-reflection { background: rgba(45,53,97,0.3); border-color: #3d4d80; color: #7080b0; }
+  .era-midnights .result-reflection strong { color: #8aabf0; }
+  .era-midnights .btn-retake { border-color: #202848; color: #7080c0; }
+
+  .era-ttpd { background: #f8f4ee; color: #1a1410; border-color: #c8b898; }
+  .era-ttpd .result-year, .era-ttpd .result-eyebrow { color: #806040; }
+  .era-ttpd .result-era { color: #604830; }
+  .era-ttpd .result-divider { background: linear-gradient(90deg, #604830, #c8b898); }
+  .era-ttpd .result-summary { color: #2a2018; }
+  .era-ttpd .result-reflection { background: rgba(96,72,48,0.08); border-color: #604830; color: #806040; }
+  .era-ttpd .result-reflection strong { color: #604830; }
+  .era-ttpd .btn-retake { border-color: #c8b898; color: #806040; }
+
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 480px) {
+    .container { padding: 28px 16px 60px; }
+    .question-card { padding: 24px 18px; }
+    .result-card { padding: 36px 20px; }
+    .thisthat { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="quiz-header">
+    <p class="eyebrow">✨ Character Study</p>
+    <h1>What Taylor Swift Era<br>Is <em>Your Character</em> In?</h1>
+    <p class="era-ticker">
+      <span style="color:#c8a020;">DEBUT</span> ·
+      <span style="color:#f0d060;">FEARLESS</span> ·
+      <span style="color:#b060e0;">SPEAK NOW</span> ·
+      <span style="color:#e03030;">RED</span> ·
+      <span style="color:#40b0e8;">1989</span> ·
+      <span style="color:#c8c8c8;">REPUTATION</span> ·
+      <span style="color:#f080c0;">LOVER</span> ·
+      <span style="color:#80b870;">FOLKLORE</span> ·
+      <span style="color:#d49040;">EVERMORE</span> ·
+      <span style="color:#6080e0;">MIDNIGHTS</span> ·
+      <span style="color:#c8a880;">TTPD</span>
+    </p>
+    <p>Answer every question as your character — not yourself. Every character is living through an era. Which one is theirs right now?</p>
+  </header>
+
+  <div class="progress-bar-wrap" style="display:none;">
+    <div class="progress-meta">
+      <span id="progress-label"></span>
+      <span id="progress-pct"></span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+
+  <!-- CARD 0: Names -->
+  <div class="question-card active" id="card-0">
+    <div class="section-label">Let's Begin</div>
+    <p class="question-text">First, tell us a little about who we're working with.</p>
+    <div class="input-group">
+      <label>Your Name (Student)</label>
+      <input type="text" id="student-name" placeholder="Your first and last name" />
+    </div>
+    <div class="input-group">
+      <label>Your Character's Name</label>
+      <input type="text" id="char-name" placeholder="What is your character called?" />
+    </div>
+    <div class="nav-row">
+      <span></span>
+      <button class="btn btn-primary" onclick="nextCard(0)">Begin →</button>
+    </div>
+  </div>
+
+  <!-- Q1 -->
+  <div class="question-card" id="card-1">
+    <div class="section-label">Question 1 of 10</div>
+    <span class="question-emoji">🌅</span>
+    <p class="question-text">Where is your character right now in their story?</p>
+    <div class="choices" id="q1">
+      <button class="choice-btn" onclick="selectChoice('q1',0,['debut','fearless'])">
+        <span class="choice-emoji">⭐</span><span class="choice-text">
+        <span class="choice-title">At the very beginning — hopeful, open, not yet tested</span>
+        <span class="choice-sub">The world still feels full of possibility. They're ready to feel everything.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',1,['speaknow','red'])">
+        <span class="choice-emoji">🌊</span><span class="choice-text">
+        <span class="choice-title">In the middle of something — emotions are running the show</span>
+        <span class="choice-sub">Things are happening fast. They feel it all intensely, maybe too much.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',2,['1989','reputation'])">
+        <span class="choice-emoji">🦋</span><span class="choice-text">
+        <span class="choice-title">In a transformation — becoming someone new on purpose</span>
+        <span class="choice-sub">The old version doesn't fit anymore. They're rebuilding.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',3,['lover'])">
+        <span class="choice-emoji">🌸</span><span class="choice-text">
+        <span class="choice-title">In a golden moment — things feel soft and right for once</span>
+        <span class="choice-sub">Not perfect. Just genuinely, quietly good.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',4,['folklore','evermore'])">
+        <span class="choice-emoji">🌲</span><span class="choice-text">
+        <span class="choice-title">Pulling back — quieter, more internal, finding what's real</span>
+        <span class="choice-sub">The noise is gone. They're figuring out who they actually are.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',5,['midnights','ttpd'])">
+        <span class="choice-emoji">🌙</span><span class="choice-text">
+        <span class="choice-title">In the dark hours — honest in ways they can't be in daylight</span>
+        <span class="choice-sub">3am thoughts. True things. A reckoning with themselves.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(1)">← Back</button>
+      <button class="btn btn-primary" id="next-1" onclick="nextCard(1)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="question-card" id="card-2">
+    <div class="section-label">Question 2 of 10</div>
+    <span class="question-emoji">💛</span>
+    <p class="question-text">How does your character love?</p>
+    <div class="choices" id="q2">
+      <button class="choice-btn" onclick="selectChoice('q2',0,['debut','fearless','lover'])">
+        <span class="choice-emoji">🥰</span><span class="choice-text">
+        <span class="choice-title">All in, no filters — they love big and show it</span>
+        <span class="choice-sub">Heart on sleeve. Fully open. They haven't learned to protect it yet.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',1,['speaknow','red'])">
+        <span class="choice-emoji">🎢</span><span class="choice-text">
+        <span class="choice-title">Intensely — sometimes more than is good for them</span>
+        <span class="choice-sub">They go all in emotionally. It's beautiful and exhausting.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',2,['1989'])">
+        <span class="choice-emoji">💃</span><span class="choice-text">
+        <span class="choice-title">Confidently — on their own terms, from a place of strength</span>
+        <span class="choice-sub">They know their worth now. Love is something they choose, not need.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',3,['reputation'])">
+        <span class="choice-emoji">🛡️</span><span class="choice-text">
+        <span class="choice-title">Carefully — only a few people get the real version</span>
+        <span class="choice-sub">Their inner circle is tiny and sacred. Those people get everything.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',4,['folklore','evermore'])">
+        <span class="choice-emoji">🌿</span><span class="choice-text">
+        <span class="choice-title">Quietly — through presence and loyalty, not grand gestures</span>
+        <span class="choice-sub">They show up. Consistently. Without needing credit for it.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',5,['midnights','ttpd'])">
+        <span class="choice-emoji">🌀</span><span class="choice-text">
+        <span class="choice-title">Complicatedly — they're still figuring out what they actually need</span>
+        <span class="choice-sub">Love is something they want and something that scares them in equal measure.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(2)">← Back</button>
+      <button class="btn btn-primary" id="next-2" onclick="nextCard(2)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="question-card" id="card-3">
+    <div class="section-label">Question 3 of 10</div>
+    <span class="question-emoji">⚡</span>
+    <p class="question-text">How does your character respond when the world disappoints them?</p>
+    <div class="choices" id="q3">
+      <button class="choice-btn" onclick="selectChoice('q3',0,['debut','fearless'])">
+        <span class="choice-emoji">🌼</span><span class="choice-text">
+        <span class="choice-title">They feel it, then choose to keep hoping anyway</span>
+        <span class="choice-sub">Optimism is a decision they make every morning.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',1,['speaknow'])">
+        <span class="choice-emoji">🎤</span><span class="choice-text">
+        <span class="choice-title">They speak up — say exactly what needs to be said</span>
+        <span class="choice-sub">They won't let something wrong go unchallenged.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',2,['red'])">
+        <span class="choice-emoji">🌧️</span><span class="choice-text">
+        <span class="choice-title">They feel it fully — all the emotions, all at once, loudly</span>
+        <span class="choice-sub">They don't suppress. They experience.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',3,['1989','reputation'])">
+        <span class="choice-emoji">🔥</span><span class="choice-text">
+        <span class="choice-title">They shake it off and reinvent — disappointment becomes fuel</span>
+        <span class="choice-sub">They don't wallow. They rebuild, better than before.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',4,['lover','folklore'])">
+        <span class="choice-emoji">🕊️</span><span class="choice-text">
+        <span class="choice-title">They try to understand it — find meaning in the disappointment</span>
+        <span class="choice-sub">Everything is a story. Even the hard parts.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',5,['evermore','midnights','ttpd'])">
+        <span class="choice-emoji">🌑</span><span class="choice-text">
+        <span class="choice-title">They sit in the dark with it for a while before they can move</span>
+        <span class="choice-sub">Processing takes time. They give themselves that time.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(3)">← Back</button>
+      <button class="btn btn-primary" id="next-3" onclick="nextCard(3)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="question-card" id="card-4">
+    <div class="section-label">Question 4 of 10</div>
+    <span class="question-emoji">🎭</span>
+    <p class="question-text">What does your character show the world versus what they keep private?</p>
+    <div class="choices" id="q4">
+      <button class="choice-btn" onclick="selectChoice('q4',0,['debut','fearless','lover'])">
+        <span class="choice-emoji">😊</span><span class="choice-text">
+        <span class="choice-title">What you see is mostly what you get — they don't perform</span>
+        <span class="choice-sub">Genuine and transparent. They're just themselves.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',1,['speaknow','red'])">
+        <span class="choice-emoji">🎭</span><span class="choice-text">
+        <span class="choice-title">They perform strength but feel everything privately</span>
+        <span class="choice-sub">Big emotions on the inside, composed on the outside. Usually.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',2,['1989'])">
+        <span class="choice-emoji">🌟</span><span class="choice-text">
+        <span class="choice-title">Confident public face — they've built a version of themselves they're proud of</span>
+        <span class="choice-sub">Not fake. Curated. There's a difference.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',3,['reputation'])">
+        <span class="choice-emoji">🐍</span><span class="choice-text">
+        <span class="choice-title">Very different — the world sees armor, close ones see everything</span>
+        <span class="choice-sub">The public version is intentional. The real version is rare.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',4,['folklore','evermore'])">
+        <span class="choice-emoji">🪵</span><span class="choice-text">
+        <span class="choice-title">They've stepped back from performing — just existing now</span>
+        <span class="choice-sub">They got tired of the version they used to be. This is realer.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',5,['midnights','ttpd'])">
+        <span class="choice-emoji">🌒</span><span class="choice-text">
+        <span class="choice-title">The real self only comes out in private — or by accident</span>
+        <span class="choice-sub">The truth leaks sometimes. Usually at the worst moments.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(4)">← Back</button>
+      <button class="btn btn-primary" id="next-4" onclick="nextCard(4)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="question-card" id="card-5">
+    <div class="section-label">Question 5 of 10</div>
+    <span class="question-emoji">🔮</span>
+    <p class="question-text">What does your character believe about who they are?</p>
+    <div class="choices" id="q5">
+      <button class="choice-btn" onclick="selectChoice('q5',0,['debut'])">
+        <span class="choice-emoji">🌱</span><span class="choice-text">
+        <span class="choice-title">Still figuring it out — young, forming, not fully formed yet</span>
+        <span class="choice-sub">They know some things about themselves. Not everything.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',1,['fearless','lover'])">
+        <span class="choice-emoji">💛</span><span class="choice-text">
+        <span class="choice-title">Good-hearted and they know it — they trust themselves</span>
+        <span class="choice-sub">They're not perfect but they mean well and that counts.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',2,['speaknow','1989'])">
+        <span class="choice-emoji">👑</span><span class="choice-text">
+        <span class="choice-title">Bold and self-possessed — they have a strong sense of who they are</span>
+        <span class="choice-sub">They know their worth. They don't shrink for anyone.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',3,['red','ttpd'])">
+        <span class="choice-emoji">🌀</span><span class="choice-text">
+        <span class="choice-title">Contradictory — they contain multitudes and it confuses them too</span>
+        <span class="choice-sub">They feel everything deeply and sometimes that's too much to make sense of.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',4,['reputation','folklore'])">
+        <span class="choice-emoji">🪞</span><span class="choice-text">
+        <span class="choice-title">Clearer than they've ever been — they've done the hard work of knowing themselves</span>
+        <span class="choice-sub">Self-knowledge hard won. They paid for it.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',5,['evermore','midnights'])">
+        <span class="choice-emoji">🌫️</span><span class="choice-text">
+        <span class="choice-title">Uncertain — they're questioning things they thought they knew</span>
+        <span class="choice-sub">Identity is something they're actively renegotiating.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(5)">← Back</button>
+      <button class="btn btn-primary" id="next-5" onclick="nextCard(5)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="question-card" id="card-6">
+    <div class="section-label">Question 6 of 10</div>
+    <span class="question-emoji">🌿</span>
+    <p class="question-text">What is your character's relationship with their past?</p>
+    <div class="choices" id="q6">
+      <button class="choice-btn" onclick="selectChoice('q6',0,['debut','fearless'])">
+        <span class="choice-emoji">📸</span><span class="choice-text">
+        <span class="choice-title">The past is still close — they're still in the middle of making it</span>
+        <span class="choice-sub">There's not much to look back on yet. The story is just starting.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',1,['speaknow','lover'])">
+        <span class="choice-emoji">🌼</span><span class="choice-text">
+        <span class="choice-title">Fond — even the hard parts taught them something</span>
+        <span class="choice-sub">Nostalgia feels warm, not heavy. They'd do it again.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',2,['red','ttpd'])">
+        <span class="choice-emoji">💔</span><span class="choice-text">
+        <span class="choice-title">Painful — there are things they can't stop going back to</span>
+        <span class="choice-sub">Some memories have teeth. They still feel them.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',3,['1989','reputation'])">
+        <span class="choice-emoji">🔥</span><span class="choice-text">
+        <span class="choice-title">They burned it — the old version of them is gone on purpose</span>
+        <span class="choice-sub">No going back. That's a choice they made and they're keeping it.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',4,['folklore','evermore'])">
+        <span class="choice-emoji">📜</span><span class="choice-text">
+        <span class="choice-title">They examine it — trying to understand what it meant</span>
+        <span class="choice-sub">The past is a story to be understood, not escaped.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',5,['midnights'])">
+        <span class="choice-emoji">🌑</span><span class="choice-text">
+        <span class="choice-title">It haunts them — things they replay at 3am they can't turn off</span>
+        <span class="choice-sub">Not healed. Not forgotten. Just... there.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(6)">← Back</button>
+      <button class="btn btn-primary" id="next-6" onclick="nextCard(6)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="question-card" id="card-7">
+    <div class="section-label">Question 7 of 10</div>
+    <span class="question-emoji">🎵</span>
+    <p class="question-text">Pick the energy that fits your character's world right now.</p>
+    <div class="choices" id="q7">
+      <button class="choice-btn" onclick="selectChoice('q7',0,['debut'])">
+        <span class="choice-emoji">🎀</span><span class="choice-text">
+        <span class="choice-title">Sweet, sincere, a little starry-eyed</span>
+        <span class="choice-sub">Everything feels like a first. Because it mostly is.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',1,['fearless','speaknow'])">
+        <span class="choice-emoji">⭐</span><span class="choice-text">
+        <span class="choice-title">Bright and bold — they're stepping into something</span>
+        <span class="choice-sub">Ready. Excited. Maybe nervous. Doing it anyway.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',2,['red'])">
+        <span class="choice-emoji">🍂</span><span class="choice-text">
+        <span class="choice-title">Vivid and messy — highs and lows, sometimes in the same day</span>
+        <span class="choice-sub">Everything is turned up. The good is very good. The bad is very bad.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',3,['1989','lover'])">
+        <span class="choice-emoji">☀️</span><span class="choice-text">
+        <span class="choice-title">Light, free, a little electric</span>
+        <span class="choice-sub">Something lifted. They feel like themselves again. Maybe better.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',4,['reputation'])">
+        <span class="choice-emoji">🌑</span><span class="choice-text">
+        <span class="choice-title">Sharp and self-possessed — don't test them</span>
+        <span class="choice-sub">They know exactly who they are and they're done explaining it.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',5,['folklore','evermore','midnights','ttpd'])">
+        <span class="choice-emoji">🕯️</span><span class="choice-text">
+        <span class="choice-title">Deep, quiet, searching — the surface is still but there's a lot below</span>
+        <span class="choice-sub">Still waters. Everything is being processed somewhere underneath.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(7)">← Back</button>
+      <button class="btn btn-primary" id="next-7" onclick="nextCard(7)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="question-card" id="card-8">
+    <div class="section-label">Question 8 of 10</div>
+    <span class="question-emoji">🗣️</span>
+    <p class="question-text">When your character has something important to say, how do they say it?</p>
+    <div class="choices" id="q8">
+      <button class="choice-btn" onclick="selectChoice('q8',0,['debut','fearless','lover'])">
+        <span class="choice-emoji">💬</span><span class="choice-text">
+        <span class="choice-title">Directly and openly — they wear their heart on their sleeve</span>
+        <span class="choice-sub">What they feel, they say. Usually.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q8',1,['speaknow','1989'])">
+        <span class="choice-emoji">🎤</span><span class="choice-text">
+        <span class="choice-title">Boldly — with confidence and clarity</span>
+        <span class="choice-sub">They know what they want to say and they say it well.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q8',2,['red','ttpd'])">
+        <span class="choice-emoji">🌊</span><span class="choice-text">
+        <span class="choice-title">Emotionally — it comes out with a lot of feeling attached</span>
+        <span class="choice-sub">Logic isn't always leading. The heart goes first.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q8',3,['reputation'])">
+        <span class="choice-emoji">🤐</span><span class="choice-text">
+        <span class="choice-title">Carefully — to the right people only, when trust is established</span>
+        <span class="choice-sub">They don't overshare. What they say to you matters.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q8',4,['folklore','evermore'])">
+        <span class="choice-emoji">📖</span><span class="choice-text">
+        <span class="choice-title">Through stories — they process out loud in narrative form</span>
+        <span class="choice-sub">They make sense of things by telling them as a story.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q8',5,['midnights'])">
+        <span class="choice-emoji">🌙</span><span class="choice-text">
+        <span class="choice-title">Rarely — and only in the dark, to themselves or one trusted person</span>
+        <span class="choice-sub">Most of it stays inside. What comes out is the real stuff.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(8)">← Back</button>
+      <button class="btn btn-primary" id="next-8" onclick="nextCard(8)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="question-card" id="card-9">
+    <div class="section-label">Question 9 of 10</div>
+    <span class="question-emoji">🧭</span>
+    <p class="question-text">What does your character need most right now?</p>
+    <div class="choices" id="q9">
+      <button class="choice-btn" onclick="selectChoice('q9',0,['debut','fearless'])">
+        <span class="choice-emoji">🚪</span><span class="choice-text">
+        <span class="choice-title">A chance — to try, to risk it, to begin</span>
+        <span class="choice-sub">They're ready. Just needs the door to open.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q9',1,['speaknow','red'])">
+        <span class="choice-emoji">💥</span><span class="choice-text">
+        <span class="choice-title">To be heard — to finally say the thing out loud</span>
+        <span class="choice-sub">It's been building. It needs somewhere to go.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q9',2,['1989','reputation'])">
+        <span class="choice-emoji">🦅</span><span class="choice-text">
+        <span class="choice-title">Freedom — from expectations, from who others decided they were</span>
+        <span class="choice-sub">They're not who they used to be. The world just hasn't caught up.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q9',3,['lover'])">
+        <span class="choice-emoji">🫶</span><span class="choice-text">
+        <span class="choice-title">Connection — to love and be loved, simply and openly</span>
+        <span class="choice-sub">Not complicated. Just real.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q9',4,['folklore','evermore'])">
+        <span class="choice-emoji">🌲</span><span class="choice-text">
+        <span class="choice-title">Space — to think, breathe, exist without performing</span>
+        <span class="choice-sub">Room to just be, without an audience.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q9',5,['midnights','ttpd'])">
+        <span class="choice-emoji">🕯️</span><span class="choice-text">
+        <span class="choice-title">Honesty with themselves — about what they actually want</span>
+        <span class="choice-sub">The lie they've been telling themselves is getting louder.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(9)">← Back</button>
+      <button class="btn btn-primary" id="next-9" onclick="nextCard(9)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="question-card" id="card-10">
+    <div class="section-label">Question 10 of 10</div>
+    <span class="question-emoji">✨</span>
+    <p class="question-text">Last one. What's the last line of your character's current chapter?</p>
+    <div class="choices" id="q10">
+      <button class="choice-btn" onclick="selectChoice('q10',0,['debut','fearless'])">
+        <span class="choice-emoji">🌟</span><span class="choice-text">
+        <span class="choice-title">"This is just the beginning."</span>
+        <span class="choice-sub">Wide open. Full of possibility. Hopeful.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q10',1,['speaknow','red'])">
+        <span class="choice-emoji">💫</span><span class="choice-text">
+        <span class="choice-title">"I felt everything. I don't regret it."</span>
+        <span class="choice-sub">Emotional. Real. Wouldn't trade the feeling for comfort.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q10',2,['1989'])">
+        <span class="choice-emoji">🌊</span><span class="choice-text">
+        <span class="choice-title">"Watch me."</span>
+        <span class="choice-sub">Confident. Self-made. They've arrived.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q10',3,['reputation'])">
+        <span class="choice-emoji">🐍</span><span class="choice-text">
+        <span class="choice-title">"They didn't see it coming."</span>
+        <span class="choice-sub">Quiet power. Strategic. Emerged stronger than anyone expected.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q10',4,['lover'])">
+        <span class="choice-emoji">🌸</span><span class="choice-text">
+        <span class="choice-title">"For the first time in a long time, things feel okay."</span>
+        <span class="choice-sub">Soft. Grateful. A breath they didn't know they were holding.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q10',5,['folklore','evermore'])">
+        <span class="choice-emoji">🌿</span><span class="choice-text">
+        <span class="choice-title">"They figured out what was real."</span>
+        <span class="choice-sub">Quiet revelation. Everything unnecessary stripped away.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q10',6,['midnights','ttpd'])">
+        <span class="choice-emoji">🌙</span><span class="choice-text">
+        <span class="choice-title">"They finally told themselves the truth."</span>
+        <span class="choice-sub">Hard. Necessary. The beginning of something honest.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(10)">← Back</button>
+      <span></span>
+    </div>
+    <button class="btn btn-submit" id="reveal-btn" onclick="handleReveal()" style="display:none;">✨ Reveal Their Era →</button>
+  </div>
+
+  <!-- TIEBREAKER CARD -->
+  <div class="question-card" id="card-tb">
+    <span class="tiebreaker-label">✨ One More Question</span>
+    <p class="question-text" id="tb-question"></p>
+    <div class="choices thisthat" id="tb-choices"></div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-section">
+    <div class="result-card" id="result-card">
+      <p class="result-eyebrow" id="res-student-label"></p>
+      <span class="result-emoji" id="res-emoji"></span>
+      <p class="result-year" id="res-year"></p>
+      <h2 class="result-era" id="res-type"></h2>
+      <p class="result-subtitle" id="res-subtitle"></p>
+      <div class="result-divider" id="res-divider"></div>
+      <p class="result-summary" id="res-summary"></p>
+      <div class="result-reflection" id="res-reflection">
+        <strong>✍️ Writing Tip</strong>
+        <span id="res-writing-tip"></span>
+      </div>
+      <button class="btn-retake" onclick="retake()">↩ Start Over</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── PROFANITY FILTER ────────────────────────────────────────────────────────
+const wholeWordOnly = ['damn','dammit','hell','crap','dick','homo','jerk','piss','sex','cum','fag','hoe','spic','rape','porn','tits','cock'];
+const substringMatch = ['ass','asses','asshole','assholes','bastard','bitch','bitches','bullshit','cunt','cunts','dickhead','douche','douchebag','faggot','faggots','fuck','fucked','fucker','fuckers','fucking','fucks','jackass','motherfucker','motherfuckers','nigga','nigger','niggers','pissed','prick','pricks','pussy','pussies','retard','retarded','shit','shits','shitty','skank','slut','sluts','twat','twats','whore','whores','wtf','ballsack','blowjob','boner','butthole','chink','clit','clits','cocks','dildo','dyke','erection','handjob','jizz','kike','lesbo','molest','orgasm','penis','pervert','porno','prostitute','rapist','screwing','shag','spank','testicle','tranny','vagina','wank','wanker','fuckface','dipshit','numbnuts','scrotum','shitheads','suckmy','jackoff','jackoffs'];
+
+function containsBadWord(input) {
+  const cleaned = input.toLowerCase().replace(/[^a-z]/g, ' ').trim();
+  const words = cleaned.split(/\s+/);
+  if (words.some(w => wholeWordOnly.includes(w))) return true;
+  if (substringMatch.some(bad => cleaned.replace(/\s/g,'').includes(bad) || cleaned.includes(bad))) return true;
+  return false;
+}
+function showWarning(inputEl) {
+  const existing = inputEl.parentNode.querySelector('.filter-warning');
+  if (existing) existing.remove();
+  inputEl.style.borderColor = 'var(--accent)';
+  inputEl.value = '';
+  const warning = document.createElement('p');
+  warning.className = 'filter-warning';
+  warning.style.cssText = 'margin-top:8px;font-size:13px;font-weight:600;color:var(--accent);';
+  warning.textContent = '✋ Make better choices! — Mrs. Brown';
+  inputEl.parentNode.appendChild(warning);
+  setTimeout(() => { warning.remove(); inputEl.style.borderColor = 'var(--border)'; }, 3500);
+}
+function checkNameInputs() {
+  const s = document.getElementById('student-name');
+  const c = document.getElementById('char-name');
+  let clean = true;
+  if (containsBadWord(s.value)) { showWarning(s); clean = false; }
+  if (containsBadWord(c.value)) { showWarning(c); clean = false; }
+  return clean;
+}
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+const TOTAL_CARDS = 10;
+const answers = {};
+
+// ─── NAVIGATION ──────────────────────────────────────────────────────────────
+function showCard(n) {
+  document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
+  const card = document.getElementById('card-' + n);
+  if (card) card.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.querySelector('.progress-bar-wrap').style.display = (n === 0 || n === 'tb') ? 'none' : 'block';
+  if (n !== 'tb') updateProgress(n);
+}
+
+function nextCard(current) {
+  if (current === 0) {
+    const sn = document.getElementById('student-name').value.trim();
+    const cn = document.getElementById('char-name').value.trim();
+    if (!sn || !cn) { alert('Please fill in both names before continuing.'); return; }
+    if (!checkNameInputs()) return;
+  }
+  showCard(current + 1);
+  // Show reveal button on last question after answer selected
+  if (current + 1 === TOTAL_CARDS) {
+    const btn = document.getElementById('reveal-btn');
+    if (btn) btn.style.display = 'none';
+  }
+}
+
+function prevCard(current) { showCard(current - 1); }
+
+function updateProgress(cardIndex) {
+  const pct = cardIndex === 0 ? 0 : Math.round((cardIndex / TOTAL_CARDS) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = cardIndex === 0 ? '' : pct + '%';
+  document.getElementById('progress-label').textContent = cardIndex === 0 ? '' : 'Question ' + cardIndex + ' of ' + TOTAL_CARDS;
+}
+
+// ─── CHOICE SELECTION ────────────────────────────────────────────────────────
+function selectChoice(qId, idx, eras) {
+  const container = document.getElementById(qId);
+  container.querySelectorAll('.choice-btn').forEach((btn, i) => btn.classList.toggle('selected', i === idx));
+  answers[qId] = { idx, eras };
+
+  if (qId.startsWith('q')) {
+    const cardNum = parseInt(qId.replace('q', ''));
+    const nextBtn = document.getElementById('next-' + cardNum);
+    if (nextBtn) nextBtn.disabled = false;
+    // Show reveal button on Q10
+    if (cardNum === 10) {
+      document.getElementById('reveal-btn').style.display = 'block';
+    }
+  }
+}
+
+// ─── SCORING ─────────────────────────────────────────────────────────────────
+const ALL_ERAS = ['debut','fearless','speaknow','red','1989','reputation','lover','folklore','evermore','midnights','ttpd'];
+
+function calcScores() {
+  const scores = {};
+  ALL_ERAS.forEach(e => scores[e] = 0);
+  Object.values(answers).forEach(a => {
+    if (a && a.eras) {
+      a.eras.forEach(era => { scores[era] += (1 / a.eras.length); });
+    }
+  });
+  return scores;
+}
+
+function getTopTwo(scores) {
+  return Object.entries(scores).sort((a,b) => b[1]-a[1]).slice(0,2);
+}
+
+// ─── TIEBREAKER DEFINITIONS ──────────────────────────────────────────────────
+const tiebreakers = {
+  'debut-fearless': {
+    question: 'Which fits your character better right now?',
+    options: [
+      { emoji: '🎀', label: 'Sincere and still finding their voice', era: 'debut' },
+      { emoji: '⭐', label: 'Bold, confident, ready to leap', era: 'fearless' }
+    ]
+  },
+  'fearless-debut': {
+    question: 'Which fits your character better right now?',
+    options: [
+      { emoji: '⭐', label: 'Bold, confident, ready to leap', era: 'fearless' },
+      { emoji: '🎀', label: 'Sincere and still finding their voice', era: 'debut' }
+    ]
+  },
+  'speaknow-red': {
+    question: 'When your character feels something deeply, what happens?',
+    options: [
+      { emoji: '🎤', label: 'They speak up — channel it into action or words', era: 'speaknow' },
+      { emoji: '🌊', label: 'They feel it fully — emotion first, action later', era: 'red' }
+    ]
+  },
+  'red-speaknow': {
+    question: 'When your character feels something deeply, what happens?',
+    options: [
+      { emoji: '🌊', label: 'They feel it fully — emotion first, action later', era: 'red' },
+      { emoji: '🎤', label: 'They speak up — channel it into action or words', era: 'speaknow' }
+    ]
+  },
+  '1989-lover': {
+    question: 'Which describes your character better?',
+    options: [
+      { emoji: '💃', label: 'Self-possessed and independent — love is a choice', era: '1989' },
+      { emoji: '🌸', label: 'Open and romantic — love is everything', era: 'lover' }
+    ]
+  },
+  'lover-1989': {
+    question: 'Which describes your character better?',
+    options: [
+      { emoji: '🌸', label: 'Open and romantic — love is everything', era: 'lover' },
+      { emoji: '💃', label: 'Self-possessed and independent — love is a choice', era: '1989' }
+    ]
+  },
+  'folklore-evermore': {
+    question: 'Which feels more like your character?',
+    options: [
+      { emoji: '🌿', label: 'Reflective and still — finding peace in the quiet', era: 'folklore' },
+      { emoji: '🌲', label: 'Darker, lonelier — carrying something heavy alone', era: 'evermore' }
+    ]
+  },
+  'evermore-folklore': {
+    question: 'Which feels more like your character?',
+    options: [
+      { emoji: '🌲', label: 'Darker, lonelier — carrying something heavy alone', era: 'evermore' },
+      { emoji: '🌿', label: 'Reflective and still — finding peace in the quiet', era: 'folklore' }
+    ]
+  },
+  'midnights-ttpd': {
+    question: 'When your character is at their most honest with themselves, it looks like...',
+    options: [
+      { emoji: '🌙', label: 'Quiet and inward — processing in the dark', era: 'midnights' },
+      { emoji: '🌀', label: 'Raw and unraveling — emotions spilling everywhere', era: 'ttpd' }
+    ]
+  },
+  'ttpd-midnights': {
+    question: 'When your character is at their most honest with themselves, it looks like...',
+    options: [
+      { emoji: '🌀', label: 'Raw and unraveling — emotions spilling everywhere', era: 'ttpd' },
+      { emoji: '🌙', label: 'Quiet and inward — processing in the dark', era: 'midnights' }
+    ]
+  }
+};
+
+function getTiebreakerKey(era1, era2) {
+  return era1 + '-' + era2;
+}
+
+// ─── HANDLE REVEAL / TIEBREAKER ──────────────────────────────────────────────
+function handleReveal() {
+  const scores = calcScores();
+  const top = getTopTwo(scores);
+  const diff = Math.abs(top[0][1] - top[1][1]);
+
+  if (diff <= 0.5) {
+    // Trigger tiebreaker
+    const key = getTiebreakerKey(top[0][0], top[1][0]);
+    const tb = tiebreakers[key] || tiebreakers[getTiebreakerKey(top[1][0], top[0][0])];
+    if (tb) {
+      showTiebreaker(tb);
+      return;
+    }
+  }
+  generateResult(top[0][0]);
+}
+
+function showTiebreaker(tb) {
+  document.getElementById('tb-question').textContent = tb.question;
+  const container = document.getElementById('tb-choices');
+  container.innerHTML = '';
+  tb.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.innerHTML = `<span class="choice-emoji">${opt.emoji}</span><span class="choice-text"><span class="choice-title">${opt.label}</span></span>`;
+    btn.onclick = () => generateResult(opt.era);
+    container.appendChild(btn);
+  });
+  showCard('tb');
+}
+
+// ─── RESULT PROFILES ─────────────────────────────────────────────────────────
+const profiles = {
+  debut: {
+    emoji: '🎵', year: 'Taylor Swift · 2006', era: 'The Debut Era',
+    subtitle: 'Sincere. Unguarded. Just beginning.',
+    cardClass: 'era-debut',
+    summary: (name) => `${name} is in their Debut era — the most honest and unguarded place a character can be. This isn't naivety. It's the rare and valuable state of someone who hasn't yet been taught to protect themselves from feeling things fully. ${name} is at the very start of their story, and everything is still forming: their voice, their values, their understanding of who they are and what they want. Debut-era characters are magnetic precisely because of this openness. They haven't learned the armor yet. The world gets their full, unfiltered self — and that's both their greatest vulnerability and their most compelling quality. The writing opportunity here is everything that happens next: the first real test, the first moment the world pushes back, and who ${name} decides to be when that happens.`,
+    tip: 'Write your character\'s first real moment of difficulty — the first time things don\'t go the way they hoped. How they respond to that first disappointment tells us everything about who they\'re going to become.'
+  },
+  fearless: {
+    emoji: '⭐', year: 'Fearless · 2008', era: 'The Fearless Era',
+    subtitle: 'Brave. Open-hearted. Choosing hope on purpose.',
+    cardClass: 'era-fearless',
+    summary: (name) => `${name} is in their Fearless era — and fearless doesn't mean nothing scares them. It means they choose to move forward anyway. This character has enough self-awareness to know the risks and enough courage to take them. They're not naive. They've seen things go wrong before. But they've made a deliberate choice to stay open, to try, to believe that good things are still possible. Fearless-era characters are the ones who make readers root for them hardest, because their hope feels earned rather than assumed. ${name} is stepping into something — a relationship, a challenge, a new chapter — with their whole heart leading the way. The writing opportunity is the moment that courage gets tested for real, and what they discover about themselves when it does.`,
+    tip: 'Give your character a moment where everything could go wrong and they choose to try anyway — not because they\'re sure it will work, but because not trying feels worse. That\'s Fearless-era bravery in one scene.'
+  },
+  speaknow: {
+    emoji: '🎤', year: 'Speak Now · 2010', era: 'The Speak Now Era',
+    subtitle: 'Bold. Principled. Says the thing nobody else will.',
+    cardClass: 'era-speaknow',
+    summary: (name) => `${name} is in their Speak Now era — which means they have something to say and they are going to say it. This is a character with a strong internal compass and the nerve to act on it, even when it's inconvenient or unwelcome. Speak Now-era characters don't wait for permission. They don't sit back and hope someone else handles it. When they see something wrong, something unfair, something that needs to be named — they name it. This takes a particular kind of courage because it's the kind that makes people uncomfortable. ${name} has a voice and they've decided to use it. The writing opportunity is what happens after they speak — the consequences, the reactions, the way it changes the room and changes them.`,
+    tip: 'Write the scene where your character says the thing. Not the buildup, not the aftermath — the actual moment they speak. Let it be awkward and brave and exactly right at the same time.'
+  },
+  red: {
+    emoji: '🍂', year: 'Red · 2012', era: 'The Red Era',
+    subtitle: 'Vivid. Feeling everything. Beautifully complicated.',
+    cardClass: 'era-red',
+    summary: (name) => `${name} is in their Red era — which is the most emotionally alive place a character can be, and also the most exhausting. Everything is turned up. The joy is vivid, the grief is sharp, the love is all-consuming, and sometimes all of that happens in the same afternoon. Red-era characters feel things more intensely than logic can always justify, and they wouldn't have it any other way — even when it costs them. ${name} is in the middle of something messy and real, and the mess is the point. The writing opportunity is showing that emotional intensity on the page without sanitizing it — letting the contradictions exist, letting ${name} love something that hurts them, letting the reader feel the heat of it.`,
+    tip: 'Write a scene where your character feels two completely opposite things at the same time — and let both be equally true. Don\'t resolve it. The Red era lives in that tension.'
+  },
+  '1989': {
+    emoji: '🌊', year: '1989 · 2014', era: 'The 1989 Era',
+    subtitle: 'Self-made. Confident. Arrived on their own terms.',
+    cardClass: 'era-1989',
+    summary: (name) => `${name} is in their 1989 era — which means something shifted, and they decided to become who they wanted to be instead of who circumstances made them. This is a character who has shed something: an old identity, an old relationship, old expectations. What's emerged is lighter, more deliberate, more themselves. 1989-era characters have a particular kind of confidence — not arrogance, but the settled self-possession of someone who has figured out who they are and stopped apologizing for it. ${name} has arrived. Not at the end of something. At the beginning of a version of themselves they actually chose. The writing opportunity is what they do with that freedom — and what it costs them to maintain it.`,
+    tip: 'Show your character making a choice that would have been impossible for who they used to be — something that requires the new version of themselves. Let the contrast show without explaining it.'
+  },
+  reputation: {
+    emoji: '🐍', year: 'Reputation · 2017', era: 'The Reputation Era',
+    subtitle: 'Transformed. Armored. Powerful in ways that were earned.',
+    cardClass: 'era-reputation',
+    summary: (name) => `${name} is in their Reputation era — which means something happened and they rebuilt. They were hurt, dismissed, betrayed, or simply tired of being misrepresented — and instead of crumbling, they made a choice. The version of ${name} that exists now is more deliberate, more guarded, and less interested in being understood by everyone. Their inner circle has narrowed to the people who actually deserve to be there, and within that circle, they are fiercely loyal. The outside world sees armor. Only a few people see what's underneath — and those people are everything. Reputation-era energy is not coldness. It's the consequence of caring too much for too long without enough care in return. ${name} has stopped explaining themselves. The writing opportunity is whoever gets close enough to make them start again.`,
+    tip: 'Write the scene where your character\'s armor slips — just for a second, just for one person. That crack is where your reader will fall completely in love with them.'
+  },
+  lover: {
+    emoji: '🌸', year: 'Lover · 2019', era: 'The Lover Era',
+    subtitle: 'Soft. Open. Choosing love without conditions.',
+    cardClass: 'era-lover',
+    summary: (name) => `${name} is in their Lover era — and this is the rarest and most vulnerable place to be. This is a character who has decided, probably after some difficulty, to be soft. To stay open. To love without building walls around it first. Lover-era characters aren't naive — they know love can go wrong. They've probably experienced it. But they've made the choice to show up anyway, to let people in, to believe that the risk is worth the possibility. ${name} is in a golden moment, or chasing one — a period where connection feels more important than protection, where the world feels a little gentler, where they let themselves want things openly. The writing opportunity is what happens to that softness when it gets tested, and whether ${name} chooses to keep it or armor up.`,
+    tip: 'Give your character a moment of pure, unguarded joy — something they let themselves have without immediately protecting against losing it. That moment of openness is the whole Lover era in miniature.'
+  },
+  folklore: {
+    emoji: '🌿', year: 'Folklore · 2020', era: 'The Folklore Era',
+    subtitle: 'Reflective. Quiet. Finding truth in stillness.',
+    cardClass: 'era-folklore',
+    summary: (name) => `${name} is in their Folklore era — which means they've stepped out of the noise and into something more honest. This character is paying attention: to themselves, to the small truths that only reveal themselves when things get quiet, to the stories they've been telling about their own life and whether those stories are actually true. Folklore-era characters grow internally and subtly. Their most important moments don't look like moments from the outside. They look like a quiet afternoon, a long walk, a conversation that seems small but changes everything. ${name} is in the process of understanding something — about themselves, about their past, about what they actually want. The writing opportunity is that quiet revelation: the moment they finally see something clearly that was always there.`,
+    tip: 'Write a scene with no plot — just your character alone, noticing something. What they see, what it makes them feel, what they realize without anyone watching. That\'s the whole Folklore era in one scene.'
+  },
+  evermore: {
+    emoji: '🌲', year: 'Evermore · 2020', era: 'The Evermore Era',
+    subtitle: 'Darker. Lonelier. Carrying something heavy with grace.',
+    cardClass: 'era-evermore',
+    summary: (name) => `${name} is in their Evermore era — the quieter, darker twin of Folklore. Where Folklore is reflective and searching, Evermore is carrying. ${name} has something on them — a grief, a weight, a truth they've been sitting with alone for a long time. They're not broken by it. They move through the world, function, maybe even seem fine from a distance. But there's something they carry that not everyone can see, and it shapes every choice they make. Evermore-era characters are often the most compelling to write because their depth is not announced. It shows up sideways — in a reaction that's bigger than the moment warrants, in a choice that doesn't quite make sense until you know what they're carrying. The writing opportunity is the person who finally figures out what ${name} has been holding, and what happens when someone else finally knows.`,
+    tip: 'Write a scene where your character\'s hidden weight surfaces unexpectedly — triggered by something small and ordinary. Don\'t explain it. Let the reader feel the heaviness without being told it\'s there.'
+  },
+  midnights: {
+    emoji: '🌙', year: 'Midnights · 2022', era: 'The Midnights Era',
+    subtitle: 'Honest in the dark. Reckoning with themselves.',
+    cardClass: 'era-midnights',
+    summary: (name) => `${name} is in their Midnights era — the most honest and the most uncomfortable place to be. This is the era of 3am thoughts, of admitting things to yourself that you can't say in daylight, of reckoning with the gap between who you want to be and who you actually are right now. Midnights-era characters are not broken. They're becoming. The process just isn't pretty and they know it. What makes this era compelling is the self-awareness — ${name} sees themselves clearly, maybe for the first time, and the clarity is both freeing and terrifying. They're on the edge of something: a decision, a confession, a change they've been putting off. The Midnights era ends when they stop lying to themselves. The writing opportunity is the moment that honesty finally has to become action.`,
+    tip: 'Write your character\'s 3am thought — the thing they can\'t stop thinking, the thing they won\'t let themselves say out loud yet. You don\'t have to resolve it. Just let it be real on the page.'
+  },
+  ttpd: {
+    emoji: '📜', year: 'The Tortured Poets Department · 2024', era: 'The TTPD Era',
+    subtitle: 'Raw. Unraveling. Feeling everything at full volume with nowhere to put it.',
+    cardClass: 'era-ttpd',
+    summary: (name) => `${name} is in their TTPD era — and this is the most intense and unguarded place in the whole map. This character is in the middle of something they cannot entirely control: emotions that are too big for the containers they've been using, feelings that spill out sideways, a version of honesty that doesn't always come out cleanly. TTPD-era characters are not dramatic for the sake of it. They're overwhelmed by the size of what they're experiencing and haven't yet found the form for it. There's something raw and almost uncomfortably real about ${name} right now. They might not even fully understand what's happening to them. The writing opportunity is extraordinary: a character in the middle of their most unguarded, unfiltered moment — before they've had time to make it into a story. That's the rawest kind of character truth.`,
+    tip: 'Write your character in the middle of feeling something they can\'t articulate yet. Not the insight — the moment before the insight, when everything is just sensation and reaction and they don\'t have words for any of it yet.'
+  }
+};
+
+// ─── GENERATE RESULT ─────────────────────────────────────────────────────────
+function generateResult(era) {
+  const profile = profiles[era];
+  const charName = document.getElementById('char-name').value.trim() || 'Your character';
+  const studentName = document.getElementById('student-name').value.trim();
+
+  document.getElementById('res-student-label').textContent = studentName ? `${studentName}'s character` : 'Character Profile';
+  document.getElementById('res-emoji').textContent = profile.emoji;
+  document.getElementById('res-year').textContent = profile.year;
+  document.getElementById('res-type').textContent = profile.era;
+  document.getElementById('res-subtitle').textContent = profile.subtitle;
+  document.getElementById('res-summary').textContent = profile.summary(charName);
+  document.getElementById('res-writing-tip').textContent = profile.tip;
+
+  const card = document.getElementById('result-card');
+  card.className = 'result-card ' + profile.cardClass;
+
+  const divider = document.getElementById('res-divider');
+  divider.className = 'result-divider ' + profile.cardClass;
+
+  // Animate progress to 100%
+  document.querySelector('.progress-bar-wrap').style.display = 'block';
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('progress-pct').textContent = '100%';
+  document.getElementById('progress-label').textContent = 'Complete! ✨';
+
+  setTimeout(() => {
+    document.querySelectorAll('.question-card').forEach(c => c.style.display = 'none');
+    document.querySelector('.progress-bar-wrap').style.display = 'none';
+    document.getElementById('result-section').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 700);
+}
+
+function retake() { window.location.reload(); }
+</script>
+</body>
+</html>
