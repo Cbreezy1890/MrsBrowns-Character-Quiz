@@ -7,9 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,400&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #212121; --ink: #1c1917; --card: #ffffff; --border: #e8e0d5;
+    --bg: #212121; --ink: #1c1917; --card: #f5f5f5; --border: #e8e0d5;
     --accent: #d8b4fe; --accent2: #4f8ef7; --accent3: #2dbd7e; --accent4: #f5a623;
-    --accent5: #9b59b6; --accent6: #e91e8c; --accent7: #00bcd4;
+    --accent5: #9b59b6; --accent6: #e91e8c; --accent7: #00bcd4; --accent8: #d4d4d4;
     --muted: #fdf6c3; --soft: #f5ede4;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -47,7 +47,7 @@
   .card-emoji { font-size: 2.2rem; line-height: 1; }
   .card-number { font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--card-accent); }
   .card-title { font-family: 'Fraunces', serif; font-size: 1.15rem; font-weight: 700; line-height: 1.3; color: var(--ink); }
-  .card-desc { font-size: 13px; color: var(--muted); font-weight: 500; line-height: 1.6; flex: 1; }
+  .card-desc { font-size: 13px; color: var(--accent8); font-weight: 500; line-height: 1.6; flex: 1; }
   .card-cta { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--card-accent); margin-top: 4px; }
   .card-cta::after { content: '→'; transition: transform 0.2s; }
   .quiz-card:hover .card-cta::after { transform: translateX(4px); }
