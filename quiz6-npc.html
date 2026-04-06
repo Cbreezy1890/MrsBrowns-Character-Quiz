@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What NPC Are They in a Video Game?</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f1a;
+    --card: #0f1520;
+    --border: #1e2d45;
+    --text: #e8f4ff;
+    --muted: #6a8aaa;
+    --accent: #00d4ff;
+    --accent2: #00ff88;
+    --accent3: #ff6b35;
+    --accent4: #ffd700;
+    --accent5: #cc44ff;
+    --progress-bg: #1e2d45;
+    --glow: rgba(0,212,255,0.08);
+    --scanline: rgba(0,212,255,0.03);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 15% 20%, rgba(0,212,255,0.07) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 80%, rgba(0,255,136,0.05) 0%, transparent 50%),
+      repeating-linear-gradient(0deg, transparent, transparent 2px, var(--scanline) 2px, var(--scanline) 4px);
+  }
+
+  .container { max-width: 680px; margin: 0 auto; padding: 44px 24px 80px; }
+
+  /* HEADER */
+  .quiz-header { text-align: center; margin-bottom: 44px; animation: fadeDown 0.7s ease both; }
+
+  .pixel-badge {
+    display: inline-block;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px; color: var(--accent2);
+    letter-spacing: 0.1em; margin-bottom: 16px;
+    text-shadow: 0 0 8px rgba(0,255,136,0.6);
+  }
+
+  .quiz-header h1 {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(1.7rem, 5.5vw, 2.6rem);
+    font-weight: 800; line-height: 1.2; color: var(--text); margin-bottom: 14px;
+    text-shadow: 0 0 20px rgba(0,212,255,0.3);
+  }
+
+  .quiz-header h1 .line1 { display: block; color: var(--text); }
+  .quiz-header h1 .line2 { display: block; color: var(--accent); text-shadow: 0 0 20px rgba(0,212,255,0.6); }
+
+  .npc-row {
+    display: flex; justify-content: center; gap: 12px;
+    margin: 16px 0; font-size: 1.5rem;
+  }
+
+  .quiz-header p {
+    font-size: 18px; color: var(--muted); font-weight: 500;
+    max-width: 460px; margin: 0 auto; line-height: 1.8;
+  }
+
+  /* HEALTH BAR PROGRESS */
+  .progress-bar-wrap { margin-bottom: 32px; }
+  .progress-meta {
+    display: flex; justify-content: space-between; font-size: 11px;
+    color: var(--muted); margin-bottom: 6px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    font-family: 'Press Start 2P', monospace;
+  }
+  .progress-meta span { font-size: 9px; }
+  .progress-bar {
+    height: 8px; background: var(--progress-bg); border-radius: 0;
+    overflow: hidden; border: 1px solid var(--border);
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 8px rgba(0,212,255,0.5);
+  }
+
+  /* CARDS */
+  .question-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 4px;
+    padding: 32px; margin-bottom: 20px; display: none;
+    animation: fadeUp 0.45s ease both;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(0,212,255,0.08);
+    position: relative;
+  }
+  .question-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+  .question-card.active { display: block; }
+
+  .section-label {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px; font-weight: 400; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+    text-shadow: 0 0 6px rgba(0,212,255,0.5);
+  }
+
+  .question-emoji { font-size: 2rem; display: block; margin-bottom: 12px; }
+
+  .question-text {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.3rem; font-weight: 800; line-height: 1.4;
+    color: var(--text); margin-bottom: 26px;
+  }
+
+  /* CHOICES */
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+
+  .choice-btn {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px 18px; border: 1px solid var(--border); border-radius: 4px;
+    background: transparent; cursor: pointer; font-family: 'Outfit', sans-serif;
+    font-size: 16px; font-weight: 500; color: var(--text); text-align: left;
+    transition: all 0.15s ease; line-height: 1.5; position: relative;
+  }
+
+  .choice-btn:hover {
+    border-color: var(--accent); background: var(--glow);
+    transform: translateX(4px);
+    box-shadow: -3px 0 0 var(--accent);
+  }
+  .choice-btn.selected {
+    border-color: var(--accent2); background: rgba(0,255,136,0.06);
+    box-shadow: -3px 0 0 var(--accent2);
+  }
+
+  .choice-emoji { font-size: 1.4rem; flex-shrink: 0; line-height: 1.3; }
+  .choice-text { flex: 1; }
+  .choice-title { font-weight: 700; color: var(--text); display: block; margin-bottom: 3px; font-size: 17px; }
+  .choice-sub { font-size: 15px; font-weight: 400; color: var(--muted); display: block; }
+
+  /* INPUTS */
+  .input-group { margin-bottom: 20px; }
+  .input-group label {
+    display: block; font-family: 'Press Start 2P', monospace; font-size: 8px;
+    font-weight: 400; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 10px;
+  }
+  .input-group input {
+    width: 100%; padding: 13px 16px; border: 1px solid var(--border);
+    border-radius: 4px; font-family: 'Outfit', sans-serif; font-size: 16px;
+    font-weight: 500; color: var(--text); background: rgba(0,0,0,0.3);
+    outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .input-group input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(0,212,255,0.15);
+  }
+  .input-group input::placeholder { color: var(--muted); }
+
+  /* NAV */
+  .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; gap: 12px; }
+
+  .btn {
+    padding: 13px 28px; border-radius: 4px; font-family: 'Outfit', sans-serif;
+    font-size: 14px; font-weight: 700; cursor: pointer; border: none;
+    transition: all 0.15s ease; letter-spacing: 0.05em; text-transform: uppercase;
+  }
+
+  .btn-primary {
+    background: var(--accent); color: var(--bg);
+    box-shadow: 0 0 16px rgba(0,212,255,0.4);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 24px rgba(0,212,255,0.6); }
+  .btn-primary:disabled { opacity: 0.25; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--muted); color: var(--text); }
+
+  .btn-submit {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    color: var(--bg); width: 100%; padding: 18px; font-size: 14px; font-weight: 800;
+    border-radius: 4px; box-shadow: 0 0 20px rgba(0,212,255,0.35);
+    margin-top: 28px; letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 0 32px rgba(0,212,255,0.5); }
+
+  /* RESULT */
+  #result-section { display: none; animation: fadeUp 0.6s ease both; }
+
+  .result-card {
+    border-radius: 4px; padding: 48px 36px; text-align: center;
+    box-shadow: 0 12px 60px rgba(0,0,0,0.6);
+    position: relative; overflow: hidden;
+  }
+  .result-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  }
+
+  .result-eyebrow {
+    font-family: 'Press Start 2P', monospace; font-size: 8px;
+    letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 14px; opacity: 0.6;
+  }
+
+  .result-emoji { font-size: 4rem; display: block; margin-bottom: 16px; }
+
+  .result-npc-type {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(0.85rem, 2.5vw, 1.1rem);
+    font-weight: 400; margin-bottom: 10px; line-height: 1.5;
+    text-shadow: 0 0 16px currentColor;
+  }
+
+  .result-subtitle {
+    font-size: 17px; font-weight: 500; margin-bottom: 28px;
+    font-family: 'Outfit', sans-serif;
+  }
+
+  .result-divider { width: 50px; height: 2px; margin: 0 auto 28px; }
+
+  .result-summary {
+    font-size: 16px; line-height: 1.85; text-align: left;
+    margin-bottom: 28px; font-weight: 400; font-family: 'Outfit', sans-serif;
+  }
+
+  .result-reflection {
+    border-left: 2px solid; border-radius: 0 8px 8px 0;
+    padding: 18px 20px; text-align: left; font-size: 15px;
+    line-height: 1.7; margin-bottom: 32px; font-family: 'Outfit', sans-serif;
+  }
+  .result-reflection strong {
+    display: block; margin-bottom: 6px; font-size: 9px;
+    letter-spacing: 0.2em; text-transform: uppercase; font-weight: 700;
+    font-family: 'Press Start 2P', monospace;
+  }
+
+  .btn-retake {
+    background: transparent; font-size: 12px; font-weight: 700; padding: 11px 24px;
+    border-radius: 4px; cursor: pointer; font-family: 'Outfit', sans-serif;
+    transition: all 0.15s; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid;
+  }
+
+  /* NPC RESULT THEMES */
+  .npc-questgiver {
+    background: #0a1020; color: #d8eaff; border: 1px solid #1a3060;
+  }
+  .npc-questgiver::before { background: linear-gradient(90deg, #4488ff, #88bbff); }
+  .npc-questgiver .result-npc-type { color: #88bbff; }
+  .npc-questgiver .result-subtitle { color: #6699cc; }
+  .npc-questgiver .result-divider { background: linear-gradient(90deg, #4488ff, #88bbff); }
+  .npc-questgiver .result-summary { color: #c0d8f0; }
+  .npc-questgiver .result-reflection { background: rgba(68,136,255,0.08); border-color: #4488ff; color: #7099cc; }
+  .npc-questgiver .result-reflection strong { color: #88bbff; }
+  .npc-questgiver .btn-retake { border-color: #1a3060; color: #6699cc; }
+  .npc-questgiver .btn-retake:hover { border-color: #88bbff; color: #88bbff; }
+
+  .npc-companion {
+    background: #0a1a10; color: #d8f0e0; border: 1px solid #1a4020;
+  }
+  .npc-companion::before { background: linear-gradient(90deg, #00cc66, #00ff88); }
+  .npc-companion .result-npc-type { color: #00ff88; }
+  .npc-companion .result-subtitle { color: #44aa66; }
+  .npc-companion .result-divider { background: linear-gradient(90deg, #00cc66, #00ff88); }
+  .npc-companion .result-summary { color: #b0d8c0; }
+  .npc-companion .result-reflection { background: rgba(0,204,102,0.08); border-color: #00cc66; color: #448866; }
+  .npc-companion .result-reflection strong { color: #00ff88; }
+  .npc-companion .btn-retake { border-color: #1a4020; color: #44aa66; }
+  .npc-companion .btn-retake:hover { border-color: #00ff88; color: #00ff88; }
+
+  .npc-merchant {
+    background: #1a1400; color: #f0e8c0; border: 1px solid #403010;
+  }
+  .npc-merchant::before { background: linear-gradient(90deg, #cc8800, #ffd700); }
+  .npc-merchant .result-npc-type { color: #ffd700; }
+  .npc-merchant .result-subtitle { color: #aa8822; }
+  .npc-merchant .result-divider { background: linear-gradient(90deg, #cc8800, #ffd700); }
+  .npc-merchant .result-summary { color: #d8c878; }
+  .npc-merchant .result-reflection { background: rgba(204,136,0,0.1); border-color: #cc8800; color: #aa8822; }
+  .npc-merchant .result-reflection strong { color: #ffd700; }
+  .npc-merchant .btn-retake { border-color: #403010; color: #aa8822; }
+  .npc-merchant .btn-retake:hover { border-color: #ffd700; color: #ffd700; }
+
+  .npc-glitch {
+    background: #160820; color: #f0d0ff; border: 1px solid #400860;
+  }
+  .npc-glitch::before { background: linear-gradient(90deg, #aa00ff, #ff00aa); }
+  .npc-glitch .result-npc-type { color: #dd88ff; }
+  .npc-glitch .result-subtitle { color: #8844aa; }
+  .npc-glitch .result-divider { background: linear-gradient(90deg, #aa00ff, #ff00aa); }
+  .npc-glitch .result-summary { color: #d0b0e8; }
+  .npc-glitch .result-reflection { background: rgba(170,0,255,0.08); border-color: #aa00ff; color: #8844aa; }
+  .npc-glitch .result-reflection strong { color: #dd88ff; }
+  .npc-glitch .btn-retake { border-color: #400860; color: #8844aa; }
+  .npc-glitch .btn-retake:hover { border-color: #dd88ff; color: #dd88ff; }
+
+  .npc-lorekeeper {
+    background: #100a00; color: #f0e0c0; border: 1px solid #3a2000;
+  }
+  .npc-lorekeeper::before { background: linear-gradient(90deg, #ff6b35, #ff9944); }
+  .npc-lorekeeper .result-npc-type { color: #ff9944; }
+  .npc-lorekeeper .result-subtitle { color: #aa5522; }
+  .npc-lorekeeper .result-divider { background: linear-gradient(90deg, #ff6b35, #ff9944); }
+  .npc-lorekeeper .result-summary { color: #d8c0a0; }
+  .npc-lorekeeper .result-reflection { background: rgba(255,107,53,0.08); border-color: #ff6b35; color: #aa5522; }
+  .npc-lorekeeper .result-reflection strong { color: #ff9944; }
+  .npc-lorekeeper .btn-retake { border-color: #3a2000; color: #aa5522; }
+  .npc-lorekeeper .btn-retake:hover { border-color: #ff9944; color: #ff9944; }
+
+  .npc-rival {
+    background: #1a0808; color: #ffe8e8; border: 1px solid #600010;
+  }
+  .npc-rival::before { background: linear-gradient(90deg, #ff2244, #ff6677); }
+  .npc-rival .result-npc-type { color: #ff6677; }
+  .npc-rival .result-subtitle { color: #aa3344; }
+  .npc-rival .result-divider { background: linear-gradient(90deg, #ff2244, #ff6677); }
+  .npc-rival .result-summary { color: #f0c8c8; }
+  .npc-rival .result-reflection { background: rgba(255,34,68,0.08); border-color: #ff2244; color: #aa3344; }
+  .npc-rival .result-reflection strong { color: #ff6677; }
+  .npc-rival .btn-retake { border-color: #600010; color: #aa3344; }
+  .npc-rival .btn-retake:hover { border-color: #ff6677; color: #ff6677; }
+
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 480px) {
+    .container { padding: 28px 16px 60px; }
+    .question-card { padding: 24px 18px; }
+    .result-card { padding: 36px 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="quiz-header">
+    <p class="pixel-badge">▶ CHARACTER STUDY ◀</p>
+    <h1>
+      <span class="line1">What NPC Are They In A</span>
+      <span class="line2">Video Game?</span>
+    </h1>
+    <div class="npc-row">🗡️ 🛡️ 🏪 🌀 📖 ⚔️</div>
+    <p>When they're not the main character — what role do they play in everyone else's narrative? Answer as your character, not yourself.</p>
+  </header>
+
+  <div class="progress-bar-wrap" style="display:none;">
+    <div class="progress-meta">
+      <span id="progress-label"></span>
+      <span id="progress-pct"></span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+
+  <!-- CARD 0 -->
+  <div class="question-card active" id="card-0">
+    <div class="section-label">▶ Player One — Enter Name</div>
+    <p class="question-text">First, tell us a little about who we're working with.</p>
+    <div class="input-group">
+      <label>Your Name (Student)</label>
+      <input type="text" id="student-name" placeholder="Your first and last name" />
+    </div>
+    <div class="input-group">
+      <label>Your Character's Name</label>
+      <input type="text" id="char-name" placeholder="What is your character called?" />
+    </div>
+    <div class="nav-row">
+      <span></span>
+      <button class="btn btn-primary" onclick="nextCard(0)">Start Game ▶</button>
+    </div>
+  </div>
+
+  <!-- Q1 -->
+  <div class="question-card" id="card-1">
+    <div class="section-label">Question 1 of 7</div>
+    <span class="question-emoji">🎮</span>
+    <p class="question-text">The main character needs help. What does your character do?</p>
+    <div class="choices" id="q1">
+      <button class="choice-btn" onclick="selectChoice('q1',0,'questgiver',this)">
+        <span class="choice-emoji">📜</span><span class="choice-text">
+        <span class="choice-title">Points them in the right direction — gives them the mission</span>
+        <span class="choice-sub">They know things. They give it out strategically, when the time is right.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',1,'companion',this)">
+        <span class="choice-emoji">🛡️</span><span class="choice-text">
+        <span class="choice-title">Shows up immediately, no questions asked, ready to go</span>
+        <span class="choice-sub">They don't need to know everything. They trust the person asking.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',2,'merchant',this)">
+        <span class="choice-emoji">🤝</span><span class="choice-text">
+        <span class="choice-title">Offers resources — has exactly what's needed at exactly the right moment</span>
+        <span class="choice-sub">They always seem to show up when something useful is required.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',3,'glitch',this)">
+        <span class="choice-emoji">⚡</span><span class="choice-text">
+        <span class="choice-title">Does something completely unexpected that somehow solves the problem</span>
+        <span class="choice-sub">Nobody planned this. It worked anyway. Moving on.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',4,'lorekeeper',this)">
+        <span class="choice-emoji">📚</span><span class="choice-text">
+        <span class="choice-title">Explains the bigger picture — tells them what this actually means</span>
+        <span class="choice-sub">Context is everything. They have all of it.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',5,'rival',this)">
+        <span class="choice-emoji">👀</span><span class="choice-text">
+        <span class="choice-title">Shows up, assesses the situation, and makes it competitive</span>
+        <span class="choice-sub">If there's a challenge, they want in on it. Always.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(1)">← Back</button>
+      <button class="btn btn-primary" id="next-1" onclick="nextCard(1)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="question-card" id="card-2">
+    <div class="section-label">Question 2 of 7</div>
+    <span class="question-emoji">🌍</span>
+    <p class="question-text">What's your character's relationship with the world around them?</p>
+    <div class="choices" id="q2">
+      <button class="choice-btn" onclick="selectChoice('q2',0,'questgiver',this)">
+        <span class="choice-emoji">🗺️</span><span class="choice-text">
+        <span class="choice-title">They understand it deeply — see patterns others miss</span>
+        <span class="choice-sub">Years of watching, learning, and waiting. They know how things work.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',1,'companion',this)">
+        <span class="choice-emoji">🤗</span><span class="choice-text">
+        <span class="choice-title">They navigate it alongside someone they care about</span>
+        <span class="choice-sub">The world makes more sense when you're moving through it together.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',2,'merchant',this)">
+        <span class="choice-emoji">⚖️</span><span class="choice-text">
+        <span class="choice-title">They move through it practically — know what everything is worth</span>
+        <span class="choice-sub">They're not attached to any one side. They just know how things flow.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',3,'glitch',this)">
+        <span class="choice-emoji">🌀</span><span class="choice-text">
+        <span class="choice-title">They experience it differently than everyone else — rules feel optional</span>
+        <span class="choice-sub">They're not breaking anything. They just... operate on a different frequency.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',4,'lorekeeper',this)">
+        <span class="choice-emoji">🏛️</span><span class="choice-text">
+        <span class="choice-title">They carry its history — remember things everyone else forgot</span>
+        <span class="choice-sub">The world has a story. They're the only one still telling it.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',5,'rival',this)">
+        <span class="choice-emoji">🏁</span><span class="choice-text">
+        <span class="choice-title">They're always measuring themselves against it</span>
+        <span class="choice-sub">Every situation is an opportunity to see where they stand.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(2)">← Back</button>
+      <button class="btn btn-primary" id="next-2" onclick="nextCard(2)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="question-card" id="card-3">
+    <div class="section-label">Question 3 of 7</div>
+    <span class="question-emoji">💬</span>
+    <p class="question-text">Someone starts a conversation with your character. What happens?</p>
+    <div class="choices" id="q3">
+      <button class="choice-btn" onclick="selectChoice('q3',0,'questgiver',this)">
+        <span class="choice-emoji">🎯</span><span class="choice-text">
+        <span class="choice-title">They listen carefully, then give the most useful response possible</span>
+        <span class="choice-sub">Every conversation is an exchange. They take both sides seriously.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',1,'companion',this)">
+        <span class="choice-emoji">😊</span><span class="choice-text">
+        <span class="choice-title">They're warm immediately — make the other person feel like the only one in the room</span>
+        <span class="choice-sub">People matter to them. It shows without them having to say it.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',2,'merchant',this)">
+        <span class="choice-emoji">🤜</span><span class="choice-text">
+        <span class="choice-title">They're friendly but efficient — find out what you need and provide it</span>
+        <span class="choice-sub">Good conversation has a point. They find it quickly.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',3,'glitch',this)">
+        <span class="choice-emoji">🎲</span><span class="choice-text">
+        <span class="choice-title">It goes somewhere nobody expected — and is somehow better for it</span>
+        <span class="choice-sub">Linear conversation is overrated. They take the scenic route.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',4,'lorekeeper',this)">
+        <span class="choice-emoji">📜</span><span class="choice-text">
+        <span class="choice-title">They have a lot to say — and it's all relevant, if you have the patience</span>
+        <span class="choice-sub">The full picture takes a minute to explain. It's worth it.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',5,'rival',this)">
+        <span class="choice-emoji">😏</span><span class="choice-text">
+        <span class="choice-title">They size the person up immediately — figure out if they're worth knowing</span>
+        <span class="choice-sub">Not everyone gets their full attention. You have to earn it.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(3)">← Back</button>
+      <button class="btn btn-primary" id="next-3" onclick="nextCard(3)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="question-card" id="card-4">
+    <div class="section-label">Question 4 of 7</div>
+    <span class="question-emoji">⚔️</span>
+    <p class="question-text">There's a conflict happening. Where is your character in it?</p>
+    <div class="choices" id="q4">
+      <button class="choice-btn" onclick="selectChoice('q4',0,'questgiver',this)">
+        <span class="choice-emoji">🧭</span><span class="choice-text">
+        <span class="choice-title">Observing — and making sure the right person knows what they need to</span>
+        <span class="choice-sub">They're not always in the fight. But they shape who wins it.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',1,'companion',this)">
+        <span class="choice-emoji">🛡️</span><span class="choice-text">
+        <span class="choice-title">Right next to the person they care about, taking hits if they have to</span>
+        <span class="choice-sub">They didn't sign up for this. They signed up for that person. Same thing.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',2,'merchant',this)">
+        <span class="choice-emoji">🚪</span><span class="choice-text">
+        <span class="choice-title">Somewhere nearby — neutral, watching, ready to be useful after</span>
+        <span class="choice-sub">Conflict is messy. They wait for the cleanup phase.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',3,'glitch',this)">
+        <span class="choice-emoji">💥</span><span class="choice-text">
+        <span class="choice-title">Accidentally in the middle of it — somehow changing everything</span>
+        <span class="choice-sub">They didn't start this. They might have ended it. Hard to say.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',4,'lorekeeper',this)">
+        <span class="choice-emoji">🕯️</span><span class="choice-text">
+        <span class="choice-title">On the sidelines — but they know exactly why this is happening</span>
+        <span class="choice-sub">This conflict has roots. They're the only one who remembers them.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',5,'rival',this)">
+        <span class="choice-emoji">🗡️</span><span class="choice-text">
+        <span class="choice-title">In it — and treating it like a test of who's actually better</span>
+        <span class="choice-sub">Every fight is information. They come out knowing more than they went in.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(4)">← Back</button>
+      <button class="btn btn-primary" id="next-4" onclick="nextCard(4)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="question-card" id="card-5">
+    <div class="section-label">Question 5 of 7</div>
+    <span class="question-emoji">🏆</span>
+    <p class="question-text">The main character succeeds at something big. How does your character react?</p>
+    <div class="choices" id="q5">
+      <button class="choice-btn" onclick="selectChoice('q5',0,'questgiver',this)">
+        <span class="choice-emoji">🎯</span><span class="choice-text">
+        <span class="choice-title">Satisfied — this is what they set in motion, and it worked</span>
+        <span class="choice-sub">They knew it would happen. They made sure it would happen.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',1,'companion',this)">
+        <span class="choice-emoji">🎉</span><span class="choice-text">
+        <span class="choice-title">Genuinely thrilled — their person won, which means they won</span>
+        <span class="choice-sub">Their success is not separate from this. It never was.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',2,'merchant',this)">
+        <span class="choice-emoji">🤝</span><span class="choice-text">
+        <span class="choice-title">Pleased — and quietly noting that they were part of why it worked</span>
+        <span class="choice-sub">They provided something essential. That matters, even if nobody says so.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',3,'glitch',this)">
+        <span class="choice-emoji">😂</span><span class="choice-text">
+        <span class="choice-title">Delighted and slightly confused — they helped but aren't sure how</span>
+        <span class="choice-sub">It worked! Great! Moving on before anyone asks too many questions.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',4,'lorekeeper',this)">
+        <span class="choice-emoji">📖</span><span class="choice-text">
+        <span class="choice-title">Quietly moved — this moment means something in the bigger story</span>
+        <span class="choice-sub">They'll remember this. They remember everything.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',5,'rival',this)">
+        <span class="choice-emoji">😤</span><span class="choice-text">
+        <span class="choice-title">Impressed — and immediately thinking about how to do better next time</span>
+        <span class="choice-sub">Respect. Genuine respect. And also: challenge accepted.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(5)">← Back</button>
+      <button class="btn btn-primary" id="next-5" onclick="nextCard(5)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="question-card" id="card-6">
+    <div class="section-label">Question 6 of 7</div>
+    <span class="question-emoji">🔍</span>
+    <p class="question-text">What does your character know that most people around them don't?</p>
+    <div class="choices" id="q6">
+      <button class="choice-btn" onclick="selectChoice('q6',0,'questgiver',this)">
+        <span class="choice-emoji">🗝️</span><span class="choice-text">
+        <span class="choice-title">What needs to happen next — and who needs to make it happen</span>
+        <span class="choice-sub">The path forward is clear to them. It's just not clear to everyone yet.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',1,'companion',this)">
+        <span class="choice-emoji">❤️</span><span class="choice-text">
+        <span class="choice-title">Who the people around them really are — what they're actually capable of</span>
+        <span class="choice-sub">They see people clearly. Sometimes more clearly than those people see themselves.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',2,'merchant',this)">
+        <span class="choice-emoji">💰</span><span class="choice-text">
+        <span class="choice-title">What things are actually worth — what's rare, what's common, what matters</span>
+        <span class="choice-sub">Value is something most people get wrong. They don't.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',3,'glitch',this)">
+        <span class="choice-emoji">🔓</span><span class="choice-text">
+        <span class="choice-title">That the rules have gaps — and those gaps can be very useful</span>
+        <span class="choice-sub">Every system has a workaround. They find them naturally.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',4,'lorekeeper',this)">
+        <span class="choice-emoji">📜</span><span class="choice-text">
+        <span class="choice-title">Where everything came from — the history that explains the present</span>
+        <span class="choice-sub">Nothing happens without a reason. They know the reasons.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',5,'rival',this)">
+        <span class="choice-emoji">📊</span><span class="choice-text">
+        <span class="choice-title">Exactly where they stand — and exactly where everyone else does too</span>
+        <span class="choice-sub">They're always keeping score. Not out of spite. Out of honesty.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(6)">← Back</button>
+      <button class="btn btn-primary" id="next-6" onclick="nextCard(6)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="question-card" id="card-7">
+    <div class="section-label">Question 7 of 7</div>
+    <span class="question-emoji">🌟</span>
+    <p class="question-text">Last one. What would your character's loading screen tip say about them?</p>
+    <div class="choices" id="q7">
+      <button class="choice-btn" onclick="selectChoice('q7',0,'questgiver',this)">
+        <span class="choice-emoji">💡</span><span class="choice-text">
+        <span class="choice-title">"Talk to them when you're lost. They always know more than they're letting on."</span>
+        <span class="choice-sub">Every word they say is chosen carefully. Listen to all of them.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',1,'companion',this)">
+        <span class="choice-emoji">🛡️</span><span class="choice-text">
+        <span class="choice-title">"They won't leave your side. Don't take that for granted."</span>
+        <span class="choice-sub">Loyalty like this is rare. Treat it accordingly.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',2,'merchant',this)">
+        <span class="choice-emoji">🏪</span><span class="choice-text">
+        <span class="choice-title">"Check in with them often. They always have something you didn't know you needed."</span>
+        <span class="choice-sub">Their inventory changes. Their usefulness doesn't.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',3,'glitch',this)">
+        <span class="choice-emoji">⚠️</span><span class="choice-text">
+        <span class="choice-title">"Unpredictable. Possibly a bug. Definitely an asset."</span>
+        <span class="choice-sub">Don't try to explain them. Just be glad they're on your side.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',4,'lorekeeper',this)">
+        <span class="choice-emoji">📖</span><span class="choice-text">
+        <span class="choice-title">"Take time to hear their whole story. It connects to everything."</span>
+        <span class="choice-sub">They've been here longest. They know things the game doesn't tell you.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',5,'rival',this)">
+        <span class="choice-emoji">🏁</span><span class="choice-text">
+        <span class="choice-title">"They're watching your progress. It makes them better. It makes you better too."</span>
+        <span class="choice-sub">The best competition pushes everyone forward. That's what they are.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(7)">← Back</button>
+      <span></span>
+    </div>
+    <button class="btn btn-submit" onclick="generateResult()">▶ Reveal Their NPC Type</button>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-section">
+    <div class="result-card" id="result-card">
+      <p class="result-eyebrow" id="res-student-label"></p>
+      <span class="result-emoji" id="res-emoji"></span>
+      <h2 class="result-npc-type" id="res-type"></h2>
+      <p class="result-subtitle" id="res-subtitle"></p>
+      <div class="result-divider" id="res-divider"></div>
+      <p class="result-summary" id="res-summary"></p>
+      <div class="result-reflection" id="res-reflection">
+        <strong>✍ Writing Tip</strong>
+        <span id="res-writing-tip"></span>
+      </div>
+      <button class="btn-retake" onclick="retake()">↩ Play Again</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── SHUFFLE CHOICES — RUNS ONCE ON CARD 0 EXIT ──────────────────────────────
+function shuffleAllChoicesOnce() {
+  document.querySelectorAll('.choices').forEach(container => {
+    const buttons = Array.from(container.querySelectorAll('.choice-btn'));
+    for (let i = buttons.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [buttons[i], buttons[j]] = [buttons[j], buttons[i]];
+    }
+    buttons.forEach(btn => container.appendChild(btn));
+  });
+}
+
+// ─── PROFANITY FILTER ────────────────────────────────────────────────────────
+const wholeWordOnly = ['damn','dammit','hell','crap','dick','homo','jerk','piss','sex','cum','fag','hoe','spic','rape','porn','tits','cock'];
+const substringMatch = ['ass','asses','asshole','assholes','bastard','bitch','bitches','bullshit','cunt','cunts','dickhead','douche','douchebag','faggot','faggots','fuck','fucked','fucker','fuckers','fucking','fucks','jackass','motherfucker','motherfuckers','nigga','nigger','niggers','pissed','prick','pricks','pussy','pussies','retard','retarded','shit','shits','shitty','skank','slut','sluts','twat','twats','whore','whores','wtf','ballsack','blowjob','boner','butthole','chink','clit','clits','cocks','dildo','dyke','erection','handjob','jizz','kike','lesbo','molest','orgasm','penis','pervert','porno','prostitute','rapist','screwing','shag','spank','testicle','tranny','vagina','wank','wanker','fuckface','dipshit','numbnuts','scrotum','shitheads','suckmy','jackoff','jackoffs'];
+
+function containsBadWord(input) {
+  const cleaned = input.toLowerCase().replace(/[^a-z]/g, ' ').trim();
+  const words = cleaned.split(/\s+/);
+  if (words.some(w => wholeWordOnly.includes(w))) return true;
+  if (substringMatch.some(bad => cleaned.replace(/\s/g,'').includes(bad) || cleaned.includes(bad))) return true;
+  return false;
+}
+function showWarning(inputEl) {
+  const existing = inputEl.parentNode.querySelector('.filter-warning');
+  if (existing) existing.remove();
+  inputEl.style.borderColor = 'var(--accent3)';
+  inputEl.value = '';
+  const warning = document.createElement('p');
+  warning.className = 'filter-warning';
+  warning.style.cssText = 'margin-top:8px;font-size:13px;font-weight:700;color:var(--accent3);font-family:"Outfit",sans-serif;';
+  warning.textContent = '⚠ Make better choices! — Mrs. Brown';
+  inputEl.parentNode.appendChild(warning);
+  setTimeout(() => { warning.remove(); inputEl.style.borderColor = 'var(--border)'; }, 3500);
+}
+function checkNameInputs() {
+  const s = document.getElementById('student-name');
+  const c = document.getElementById('char-name');
+  let clean = true;
+  if (containsBadWord(s.value)) { showWarning(s); clean = false; }
+  if (containsBadWord(c.value)) { showWarning(c); clean = false; }
+  return clean;
+}
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+const TOTAL_CARDS = 7;
+const answers = {};
+
+// ─── NAVIGATION ──────────────────────────────────────────────────────────────
+function showCard(n) {
+  document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
+  document.getElementById('card-' + n).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.querySelector('.progress-bar-wrap').style.display = n === 0 ? 'none' : 'block';
+  updateProgress(n);
+}
+
+function nextCard(current) {
+  if (current === 0) {
+    const sn = document.getElementById('student-name').value.trim();
+    const cn = document.getElementById('char-name').value.trim();
+    if (!sn || !cn) { alert('Please fill in both names before continuing.'); return; }
+    if (!checkNameInputs()) return;
+    shuffleAllChoicesOnce(); // one-time shuffle of all answer orders
+  }
+  showCard(current + 1);
+}
+
+function prevCard(current) { showCard(current - 1); }
+
+function updateProgress(cardIndex) {
+  const pct = cardIndex === 0 ? 0 : Math.round((cardIndex / TOTAL_CARDS) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = cardIndex === 0 ? '' : pct + '%';
+  document.getElementById('progress-label').textContent = cardIndex === 0 ? '' : 'Q' + cardIndex + ' / ' + TOTAL_CARDS;
+}
+
+function selectChoice(qId, idx, type, btn) {
+  const container = document.getElementById(qId);
+  container.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  answers[qId] = { type };
+  const nextBtn = document.getElementById('next-' + parseInt(qId.replace('q', '')));
+  if (nextBtn) nextBtn.disabled = false;
+}
+
+function getDominantType() {
+  const scores = { questgiver: 0, companion: 0, merchant: 0, glitch: 0, lorekeeper: 0, rival: 0 };
+  Object.values(answers).forEach(a => { if (a && a.type) scores[a.type]++; });
+  return Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0];
+}
+
+// ─── RESULT PROFILES ─────────────────────────────────────────────────────────
+const profiles = {
+  questgiver: {
+    emoji: '🗡️',
+    type: 'THE QUEST GIVER',
+    subtitle: 'Knows more than they say. Points the way forward.',
+    cardClass: 'npc-questgiver',
+    summary: (name) => `${name} is the NPC that changes everything the moment the main character walks up to them. They have information — real, important, carefully held information — and they release it at exactly the right moment, to exactly the right person. This is a character who understands the bigger picture when everyone else is focused on the scene in front of them. They know what needs to happen. They know who needs to make it happen. And they have an uncanny sense of when someone is finally ready to hear it. Quest Givers are never just background characters. They're the reason the story moves at all. The main character might get the glory, but ${name} is the one who pointed them at the door. Their writing opportunity is the moment we find out what they've been waiting for, and why they've been holding it so carefully until now.`,
+    tip: 'Write a scene where your character finally reveals something they\'ve been keeping back — not dramatically, just quietly, to the right person at the right moment. The restraint before that moment is what makes it land.'
+  },
+  companion: {
+    emoji: '🛡️',
+    type: 'THE LOYAL COMPANION',
+    subtitle: 'Shows up without being asked. Stays without being told.',
+    cardClass: 'npc-companion',
+    summary: (name) => `${name} is the NPC every player secretly relies on more than they realize until something goes wrong and they\'re not there. The Loyal Companion doesn\'t need the spotlight. They don\'t need to be the most interesting character in the room. What they need is for the person they\'ve chosen to care about to be okay — and they will move heaven and earth to make that happen quietly and without fanfare. This is not a passive kind of loyalty. It takes real strength to consistently put someone else first without losing yourself in the process. ${name} has that strength. Their danger is that this kind of dedication can be taken for granted, and their story gets most interesting when someone finally notices what they\'ve been quietly carrying. The writing opportunity is the moment ${name} finally needs something, and whether anyone is paying enough attention to notice.`,
+    tip: 'Write a scene from your character\'s perspective — not the main character\'s. Show us what it looks like to be the one who always shows up. What does that feel like from the inside?'
+  },
+  merchant: {
+    emoji: '🏪',
+    type: 'THE MERCHANT',
+    subtitle: 'Always has what you need. Asks for something in return.',
+    cardClass: 'npc-merchant',
+    summary: (name) => `${name} is the NPC who shows up at exactly the right moment with exactly what\'s needed — and makes it look effortless. The Merchant knows the value of things. Not just coins and items, but information, timing, relationships, and favors. They move through the world with a kind of practical neutrality that makes them useful to almost everyone, and deeply aligned with almost no one. This isn\'t coldness. It\'s a specific kind of intelligence — the ability to see what something is actually worth, not just what it appears to be worth. ${name} builds trust through reliability rather than affection. Show up enough times with the right thing at the right moment, and people start to count on you. Their writing opportunity is the moment someone asks them for something they can\'t provide neutrally — when the transaction requires them to actually take a side.`,
+    tip: 'Write your character in a moment where they have to choose between their neutrality and something they actually care about. That choice is where the Merchant becomes a person.'
+  },
+  glitch: {
+    emoji: '🌀',
+    type: 'THE GLITCHED NPC',
+    subtitle: 'Unpredictable. Possibly a bug. Definitely an asset.',
+    cardClass: 'npc-glitch',
+    summary: (name) => `${name} is the NPC that the game designers didn\'t fully account for — and somehow that makes them the most memorable character in the whole story. The Glitched NPC doesn\'t follow expected patterns. They show up where they shouldn\'t, say things that seem off-topic until suddenly they\'re exactly right, and solve problems through methods that nobody else would have considered because nobody else thinks that way. This character is not chaotic for its own sake. There\'s a logic to them, it just runs on a different operating system than everyone else. What looks like randomness is actually a completely different kind of intelligence — lateral, associative, willing to skip steps that everyone else treats as mandatory. ${name} is the wildcard that changes what\'s possible. Their writing opportunity is the moment their particular frequency of thinking is exactly what the situation needed, and everyone finally sees it.`,
+    tip: 'Give your character a moment where their unpredictable approach solves something that every conventional attempt failed to crack. Don\'t explain how it worked. Just let it work.'
+  },
+  lorekeeper: {
+    emoji: '📖',
+    type: 'THE LORE KEEPER',
+    subtitle: 'Remembers everything. Underestimated by everyone.',
+    cardClass: 'npc-lorekeeper',
+    summary: (name) => `${name} is the NPC that most players walk past too quickly — and regret it later. The Lore Keeper holds the world\'s memory. They know where things came from, why conflicts started, what the land looked like before, and what the old names meant. They carry knowledge that has no obvious immediate use until suddenly it\'s the only thing that matters. Most people underestimate them because their power isn\'t loud. It doesn\'t flash or swing a sword. It sits quietly in a corner and waits to be asked the right question. ${name} has a rich inner world that never gets fully expressed because not enough people think to ask. The tragedy of the Lore Keeper is that they\'re ready to share everything — they just need someone patient enough to listen. Their writing opportunity is the conversation that finally happens when the right person sits down and asks the right question.`,
+    tip: 'Write the scene where someone finally sits down with your character and asks them to explain something they\'ve been carrying alone for a long time. Show us what it looks like when they finally get to tell it.'
+  },
+  rival: {
+    emoji: '⚔️',
+    type: 'THE RIVAL NPC',
+    subtitle: 'Always one step ahead or one step behind. Never gone.',
+    cardClass: 'npc-rival',
+    summary: (name) => `${name} is the NPC who makes the main character better without meaning to — and the main character makes them better right back. The Rival isn\'t a villain. They\'re something more complicated and more interesting: someone who runs parallel to the protagonist, measuring themselves against the same challenges, achieving some of the same things, failing at some of the same things, and never quite disappearing no matter how many times the story tries to move on without them. ${name} respects the main character in the specific way rivals do — which is the most honest kind of respect there is. You don\'t measure yourself against someone you don\'t think is worth measuring against. Their relationship to the protagonist has no simple label. It\'s not friendship, not enmity, not quite alliance. It\'s something that pushes both of them toward their best version. Their writing opportunity is the moment they have to decide whether the rivalry is the point, or the relationship underneath it is.`,
+    tip: 'Write a scene between your character and the main character where neither of them says what they actually mean — but both of them know it. The Rival relationship lives in what\'s left unsaid.'
+  }
+};
+
+// ─── GENERATE RESULT ─────────────────────────────────────────────────────────
+function generateResult() {
+  const type = getDominantType();
+  const profile = profiles[type];
+  const charName = document.getElementById('char-name').value.trim() || 'Your character';
+  const studentName = document.getElementById('student-name').value.trim();
+
+  document.getElementById('res-student-label').textContent = studentName ? `${studentName}'s character` : 'Character Profile';
+  document.getElementById('res-emoji').textContent = profile.emoji;
+  document.getElementById('res-type').textContent = profile.type;
+  document.getElementById('res-subtitle').textContent = profile.subtitle;
+  document.getElementById('res-summary').textContent = profile.summary(charName);
+  document.getElementById('res-writing-tip').textContent = profile.tip;
+
+  const card = document.getElementById('result-card');
+  card.className = 'result-card ' + profile.cardClass;
+  document.getElementById('res-divider').className = 'result-divider ' + profile.cardClass;
+
+  document.querySelector('.progress-bar-wrap').style.display = 'block';
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('progress-pct').textContent = '100%';
+  document.getElementById('progress-label').textContent = 'GAME COMPLETE';
+
+  setTimeout(() => {
+    document.querySelectorAll('.question-card').forEach(c => c.style.display = 'none');
+    document.querySelector('.progress-bar-wrap').style.display = 'none';
+    document.getElementById('result-section').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 700);
+}
+
+function retake() { window.location.reload(); }
+</script>
+</body>
+</html>
