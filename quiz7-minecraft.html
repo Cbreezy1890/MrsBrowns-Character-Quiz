@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What's Your Character's Minecraft Survival Strategy?</title>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1a2a1a;
+    --card: #1e3a1e;
+    --border: #2d5a2d;
+    --text: #e8f5e8;
+    --muted: #7aaa7a;
+    --accent: #5dbb63;
+    --accent2: #8bc34a;
+    --accent3: #ff8f00;
+    --accent4: #29b6f6;
+    --dirt: #8b6340;
+    --stone: #9e9e9e;
+    --progress-bg: #0d1f0d;
+    --glow: rgba(93,187,99,0.1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 20% 20%, rgba(93,187,99,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(139,195,74,0.06) 0%, transparent 50%),
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 31px,
+        rgba(45,90,45,0.15) 31px,
+        rgba(45,90,45,0.15) 32px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 31px,
+        rgba(45,90,45,0.15) 31px,
+        rgba(45,90,45,0.15) 32px
+      );
+  }
+
+  .container { max-width: 680px; margin: 0 auto; padding: 44px 24px 80px; }
+
+  /* HEADER */
+  .quiz-header { text-align: center; margin-bottom: 44px; animation: fadeDown 0.7s ease both; }
+
+  .pixel-badge {
+    font-family: 'VT323', monospace;
+    font-size: 18px; color: var(--accent2); letter-spacing: 0.15em;
+    margin-bottom: 14px; display: block;
+    text-shadow: 0 0 10px rgba(139,195,74,0.5);
+  }
+
+  .quiz-header h1 {
+    font-family: 'Nunito', sans-serif;
+    font-size: clamp(1.7rem, 5vw, 2.5rem);
+    font-weight: 900; line-height: 1.2; color: var(--text); margin-bottom: 6px;
+  }
+
+  .quiz-header h1 .line2 {
+    display: block; color: var(--accent);
+    text-shadow: 0 0 20px rgba(93,187,99,0.4);
+  }
+
+  .block-row {
+    display: flex; justify-content: center; gap: 8px;
+    margin: 16px 0; font-size: 1.5rem;
+  }
+
+  .quiz-header p {
+    font-size: 18px; color: var(--muted); font-weight: 600;
+    max-width: 460px; margin: 0 auto; line-height: 1.75;
+  }
+
+  /* PROGRESS */
+  .progress-bar-wrap { margin-bottom: 32px; }
+  .progress-meta {
+    display: flex; justify-content: space-between;
+    font-family: 'VT323', monospace; font-size: 16px;
+    color: var(--muted); margin-bottom: 6px; letter-spacing: 0.08em;
+  }
+  .progress-bar {
+    height: 12px; background: var(--progress-bg);
+    border: 2px solid var(--border); overflow: hidden;
+    border-radius: 0;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 8px rgba(93,187,99,0.6);
+  }
+
+  /* CARDS */
+  .question-card {
+    background: var(--card); border: 2px solid var(--border);
+    border-radius: 4px; padding: 32px; margin-bottom: 20px; display: none;
+    animation: fadeUp 0.45s ease both;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(93,187,99,0.1);
+    position: relative;
+  }
+  .question-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+  }
+  .question-card.active { display: block; }
+
+  .section-label {
+    font-family: 'VT323', monospace;
+    font-size: 16px; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+    text-shadow: 0 0 8px rgba(93,187,99,0.4);
+  }
+
+  .question-emoji { font-size: 2rem; display: block; margin-bottom: 12px; }
+
+  .question-text {
+    font-size: 1.3rem; font-weight: 800; line-height: 1.4;
+    color: var(--text); margin-bottom: 26px;
+  }
+
+  /* CHOICES */
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+
+  .choice-btn {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px 18px; border: 2px solid var(--border); border-radius: 4px;
+    background: rgba(0,0,0,0.2); cursor: pointer; font-family: 'Nunito', sans-serif;
+    font-size: 16px; font-weight: 600; color: var(--text); text-align: left;
+    transition: all 0.15s ease; line-height: 1.5;
+  }
+
+  .choice-btn:hover {
+    border-color: var(--accent); background: var(--glow);
+    transform: translateX(4px);
+    box-shadow: -3px 0 0 var(--accent);
+  }
+  .choice-btn.selected {
+    border-color: var(--accent2); background: rgba(139,195,74,0.08);
+    box-shadow: -3px 0 0 var(--accent2);
+  }
+
+  .choice-emoji { font-size: 1.4rem; flex-shrink: 0; line-height: 1.3; }
+  .choice-text { flex: 1; }
+  .choice-title { font-weight: 800; color: var(--text); display: block; margin-bottom: 3px; font-size: 17px; }
+  .choice-sub { font-size: 15px; font-weight: 500; color: var(--muted); display: block; }
+
+  /* INPUTS */
+  .input-group { margin-bottom: 20px; }
+  .input-group label {
+    display: block; font-family: 'VT323', monospace; font-size: 16px;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 8px;
+  }
+  .input-group input {
+    width: 100%; padding: 13px 16px; border: 2px solid var(--border);
+    border-radius: 4px; font-family: 'Nunito', sans-serif; font-size: 16px;
+    font-weight: 600; color: var(--text); background: rgba(0,0,0,0.3);
+    outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .input-group input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(93,187,99,0.15);
+  }
+  .input-group input::placeholder { color: var(--muted); }
+
+  /* NAV */
+  .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; gap: 12px; }
+
+  .btn {
+    padding: 13px 28px; border-radius: 4px; font-family: 'Nunito', sans-serif;
+    font-size: 14px; font-weight: 800; cursor: pointer; border: none;
+    transition: all 0.15s ease; letter-spacing: 0.03em; text-transform: uppercase;
+  }
+
+  .btn-primary {
+    background: var(--accent); color: #0d1f0d;
+    box-shadow: 0 0 16px rgba(93,187,99,0.4), 0 3px 0 #3a8a40;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 24px rgba(93,187,99,0.6), 0 5px 0 #3a8a40; }
+  .btn-primary:active { transform: translateY(1px); box-shadow: 0 0 16px rgba(93,187,99,0.4), 0 1px 0 #3a8a40; }
+  .btn-primary:disabled { opacity: 0.25; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .btn-ghost { background: transparent; color: var(--muted); border: 2px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--muted); color: var(--text); }
+
+  .btn-submit {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    color: #0d1f0d; width: 100%; padding: 18px; font-size: 15px; font-weight: 900;
+    border-radius: 4px; box-shadow: 0 0 20px rgba(93,187,99,0.4), 0 4px 0 #3a8a40;
+    margin-top: 28px; letter-spacing: 0.05em; text-transform: uppercase;
+  }
+  .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 0 32px rgba(93,187,99,0.5), 0 6px 0 #3a8a40; }
+
+  /* RESULT */
+  #result-section { display: none; animation: fadeUp 0.6s ease both; }
+
+  .result-card {
+    border-radius: 4px; padding: 48px 36px; text-align: center;
+    box-shadow: 0 12px 60px rgba(0,0,0,0.6);
+    position: relative; overflow: hidden; border: 2px solid;
+  }
+  .result-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  }
+
+  .result-eyebrow {
+    font-family: 'VT323', monospace; font-size: 16px;
+    letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 14px; opacity: 0.7;
+  }
+
+  .result-emoji { font-size: 4rem; display: block; margin-bottom: 16px; }
+
+  .result-type {
+    font-family: 'VT323', monospace;
+    font-size: clamp(2rem, 6vw, 3rem);
+    font-weight: 400; margin-bottom: 8px; line-height: 1.2;
+    letter-spacing: 0.05em;
+  }
+
+  .result-subtitle {
+    font-size: 17px; font-weight: 700; margin-bottom: 28px;
+  }
+
+  .result-divider { width: 60px; height: 3px; margin: 0 auto 28px; border-radius: 0; }
+
+  .result-real-life {
+    border-radius: 4px; padding: 16px 20px;
+    margin-bottom: 24px; text-align: left;
+  }
+  .result-real-life strong {
+    font-family: 'VT323', monospace; font-size: 14px;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    display: block; margin-bottom: 8px;
+  }
+  .result-real-life p { font-size: 15px; font-weight: 600; line-height: 1.6; }
+
+  .result-summary {
+    font-size: 16px; line-height: 1.85; text-align: left;
+    margin-bottom: 28px; font-weight: 500;
+  }
+
+  .result-reflection {
+    border-left: 3px solid; border-radius: 0 8px 8px 0;
+    padding: 18px 20px; text-align: left; font-size: 15px;
+    line-height: 1.7; margin-bottom: 32px; font-weight: 500;
+  }
+  .result-reflection strong {
+    display: block; margin-bottom: 6px;
+    font-family: 'VT323', monospace; font-size: 14px;
+    letter-spacing: 0.2em; text-transform: uppercase;
+  }
+
+  .btn-retake {
+    background: transparent; font-size: 13px; font-weight: 800; padding: 11px 24px;
+    border-radius: 4px; cursor: pointer; font-family: 'Nunito', sans-serif;
+    transition: all 0.15s; letter-spacing: 0.05em; text-transform: uppercase; border: 2px solid;
+  }
+
+  /* RESULT THEMES */
+  .mc-planner {
+    background: #0a1a2a; color: #d0e8ff; border-color: #1a4060;
+  }
+  .mc-planner::before { background: linear-gradient(90deg, #29b6f6, #4fc3f7); }
+  .mc-planner .result-type { color: #29b6f6; text-shadow: 0 0 20px rgba(41,182,246,0.5); }
+  .mc-planner .result-subtitle { color: #4a9ab8; }
+  .mc-planner .result-divider { background: linear-gradient(90deg, #29b6f6, #4fc3f7); }
+  .mc-planner .result-real-life { background: rgba(41,182,246,0.08); border: 1px solid rgba(41,182,246,0.2); }
+  .mc-planner .result-real-life strong { color: #29b6f6; }
+  .mc-planner .result-real-life p { color: #a0c8e0; }
+  .mc-planner .result-summary { color: #b0d0e8; }
+  .mc-planner .result-reflection { background: rgba(41,182,246,0.06); border-color: #29b6f6; color: #7aaBcc; }
+  .mc-planner .result-reflection strong { color: #29b6f6; }
+  .mc-planner .btn-retake { border-color: #1a4060; color: #4a9ab8; }
+  .mc-planner .btn-retake:hover { border-color: #29b6f6; color: #29b6f6; }
+
+  .mc-explorer {
+    background: #1a1a0a; color: #f0f0c8; border-color: #504010;
+  }
+  .mc-explorer::before { background: linear-gradient(90deg, #ffd700, #ffec6e); }
+  .mc-explorer .result-type { color: #ffd700; text-shadow: 0 0 20px rgba(255,215,0,0.5); }
+  .mc-explorer .result-subtitle { color: #aa9020; }
+  .mc-explorer .result-divider { background: linear-gradient(90deg, #ffd700, #ffec6e); }
+  .mc-explorer .result-real-life { background: rgba(255,215,0,0.08); border: 1px solid rgba(255,215,0,0.2); }
+  .mc-explorer .result-real-life strong { color: #ffd700; }
+  .mc-explorer .result-real-life p { color: #c8c080; }
+  .mc-explorer .result-summary { color: #d0d0a0; }
+  .mc-explorer .result-reflection { background: rgba(255,215,0,0.06); border-color: #ffd700; color: #aa9020; }
+  .mc-explorer .result-reflection strong { color: #ffd700; }
+  .mc-explorer .btn-retake { border-color: #504010; color: #aa9020; }
+  .mc-explorer .btn-retake:hover { border-color: #ffd700; color: #ffd700; }
+
+  .mc-builder {
+    background: #1a0a1a; color: #f0d0f0; border-color: #501050;
+  }
+  .mc-builder::before { background: linear-gradient(90deg, #ce93d8, #f48fb1); }
+  .mc-builder .result-type { color: #ce93d8; text-shadow: 0 0 20px rgba(206,147,216,0.5); }
+  .mc-builder .result-subtitle { color: #8a5a8a; }
+  .mc-builder .result-divider { background: linear-gradient(90deg, #ce93d8, #f48fb1); }
+  .mc-builder .result-real-life { background: rgba(206,147,216,0.08); border: 1px solid rgba(206,147,216,0.2); }
+  .mc-builder .result-real-life strong { color: #ce93d8; }
+  .mc-builder .result-real-life p { color: #c0a0c0; }
+  .mc-builder .result-summary { color: #d0b0d0; }
+  .mc-builder .result-reflection { background: rgba(206,147,216,0.06); border-color: #ce93d8; color: #9a6a9a; }
+  .mc-builder .result-reflection strong { color: #ce93d8; }
+  .mc-builder .btn-retake { border-color: #501050; color: #8a5a8a; }
+  .mc-builder .btn-retake:hover { border-color: #ce93d8; color: #ce93d8; }
+
+  .mc-fighter {
+    background: #1a0808; color: #ffe8e0; border-color: #601010;
+  }
+  .mc-fighter::before { background: linear-gradient(90deg, #ef5350, #ff8a65); }
+  .mc-fighter .result-type { color: #ef5350; text-shadow: 0 0 20px rgba(239,83,80,0.5); }
+  .mc-fighter .result-subtitle { color: #aa3030; }
+  .mc-fighter .result-divider { background: linear-gradient(90deg, #ef5350, #ff8a65); }
+  .mc-fighter .result-real-life { background: rgba(239,83,80,0.08); border: 1px solid rgba(239,83,80,0.2); }
+  .mc-fighter .result-real-life strong { color: #ef5350; }
+  .mc-fighter .result-real-life p { color: #c09090; }
+  .mc-fighter .result-summary { color: #d0a8a8; }
+  .mc-fighter .result-reflection { background: rgba(239,83,80,0.06); border-color: #ef5350; color: #aa5050; }
+  .mc-fighter .result-reflection strong { color: #ef5350; }
+  .mc-fighter .btn-retake { border-color: #601010; color: #aa3030; }
+  .mc-fighter .btn-retake:hover { border-color: #ef5350; color: #ef5350; }
+
+  .mc-hoarder {
+    background: #100e00; color: #f0e8c0; border-color: #403800;
+  }
+  .mc-hoarder::before { background: linear-gradient(90deg, #ff8f00, #ffc107); }
+  .mc-hoarder .result-type { color: #ff8f00; text-shadow: 0 0 20px rgba(255,143,0,0.5); }
+  .mc-hoarder .result-subtitle { color: #aa6000; }
+  .mc-hoarder .result-divider { background: linear-gradient(90deg, #ff8f00, #ffc107); }
+  .mc-hoarder .result-real-life { background: rgba(255,143,0,0.08); border: 1px solid rgba(255,143,0,0.2); }
+  .mc-hoarder .result-real-life strong { color: #ff8f00; }
+  .mc-hoarder .result-real-life p { color: #c0a060; }
+  .mc-hoarder .result-summary { color: #d0c080; }
+  .mc-hoarder .result-reflection { background: rgba(255,143,0,0.06); border-color: #ff8f00; color: #aa7030; }
+  .mc-hoarder .result-reflection strong { color: #ff8f00; }
+  .mc-hoarder .btn-retake { border-color: #403800; color: #aa6000; }
+  .mc-hoarder .btn-retake:hover { border-color: #ff8f00; color: #ff8f00; }
+
+  .mc-helper {
+    background: #0a1a0a; color: #d0f0d0; border-color: #1a501a;
+  }
+  .mc-helper::before { background: linear-gradient(90deg, #5dbb63, #8bc34a); }
+  .mc-helper .result-type { color: #5dbb63; text-shadow: 0 0 20px rgba(93,187,99,0.5); }
+  .mc-helper .result-subtitle { color: #3a7a3a; }
+  .mc-helper .result-divider { background: linear-gradient(90deg, #5dbb63, #8bc34a); }
+  .mc-helper .result-real-life { background: rgba(93,187,99,0.08); border: 1px solid rgba(93,187,99,0.2); }
+  .mc-helper .result-real-life strong { color: #5dbb63; }
+  .mc-helper .result-real-life p { color: #90c090; }
+  .mc-helper .result-summary { color: #b0d8b0; }
+  .mc-helper .result-reflection { background: rgba(93,187,99,0.06); border-color: #5dbb63; color: #4a8a4a; }
+  .mc-helper .result-reflection strong { color: #5dbb63; }
+  .mc-helper .btn-retake { border-color: #1a501a; color: #3a7a3a; }
+  .mc-helper .btn-retake:hover { border-color: #5dbb63; color: #5dbb63; }
+
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 480px) {
+    .container { padding: 28px 16px 60px; }
+    .question-card { padding: 24px 18px; }
+    .result-card { padding: 36px 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="quiz-header">
+    <span class="pixel-badge">⛏ CHARACTER STUDY ⛏</span>
+    <h1>What's Your Character's
+      <span class="line2">Minecraft Strategy?</span>
+    </h1>
+    <div class="block-row">🪵 ⛏️ 🧱 🗡️ 💎 🌾</div>
+    <p>How your character survives says everything about how they treat people. Answer as your character — not yourself.</p>
+  </header>
+
+  <div class="progress-bar-wrap" style="display:none;">
+    <div class="progress-meta">
+      <span id="progress-label"></span>
+      <span id="progress-pct"></span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+
+  <!-- CARD 0 -->
+  <div class="question-card active" id="card-0">
+    <div class="section-label">⛏ New World — Enter Name</div>
+    <p class="question-text">First, tell us a little about who we're working with.</p>
+    <div class="input-group">
+      <label>Your Name (Student)</label>
+      <input type="text" id="student-name" placeholder="Your first and last name" />
+    </div>
+    <div class="input-group">
+      <label>Your Character's Name</label>
+      <input type="text" id="char-name" placeholder="What is your character called?" />
+    </div>
+    <div class="nav-row">
+      <span></span>
+      <button class="btn btn-primary" onclick="nextCard(0)">Spawn In ⛏</button>
+    </div>
+  </div>
+
+  <!-- Q1 -->
+  <div class="question-card" id="card-1">
+    <div class="section-label">Question 1 of 7</div>
+    <span class="question-emoji">🌅</span>
+    <p class="question-text">It's night one in a new world. What does your character do first?</p>
+    <div class="choices" id="q1">
+      <button class="choice-btn" onclick="selectChoice('q1',0,'planner',this)">
+        <span class="choice-emoji">🪵</span><span class="choice-text">
+        <span class="choice-title">Punch trees, gather wood, build a small shelter before dark</span>
+        <span class="choice-sub">First things first. Survive tonight, figure out tomorrow later.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',1,'explorer',this)">
+        <span class="choice-emoji">🏃</span><span class="choice-text">
+        <span class="choice-title">Run off to explore — there's a mountain over there and they need to see it</span>
+        <span class="choice-sub">The shelter can wait. What's over that hill?</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',2,'builder',this)">
+        <span class="choice-emoji">🧱</span><span class="choice-text">
+        <span class="choice-title">Start planning where their base will go — it has to be in the right spot</span>
+        <span class="choice-sub">Location matters. They're already thinking about the final build.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',3,'fighter',this)">
+        <span class="choice-emoji">🗡️</span><span class="choice-text">
+        <span class="choice-title">Find a cave immediately and head straight down</span>
+        <span class="choice-sub">Resources are underground. Why wait until day two?</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',4,'hoarder',this)">
+        <span class="choice-emoji">🎒</span><span class="choice-text">
+        <span class="choice-title">Collect everything in sight — wood, dirt, gravel, seeds, all of it</span>
+        <span class="choice-sub">You never know what you'll need. Better to have it.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q1',5,'helper',this)">
+        <span class="choice-emoji">🤝</span><span class="choice-text">
+        <span class="choice-title">Check in with everyone else and make sure the group has a plan</span>
+        <span class="choice-sub">Nobody survives alone. What does everyone need?</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(1)">← Back</button>
+      <button class="btn btn-primary" id="next-1" onclick="nextCard(1)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="question-card" id="card-2">
+    <div class="section-label">Question 2 of 7</div>
+    <span class="question-emoji">💎</span>
+    <p class="question-text">Your character finds diamonds. What happens next?</p>
+    <div class="choices" id="q2">
+      <button class="choice-btn" onclick="selectChoice('q2',0,'planner',this)">
+        <span class="choice-emoji">📋</span><span class="choice-text">
+        <span class="choice-title">Makes exactly what they planned — sword, pickaxe, armor in that order</span>
+        <span class="choice-sub">They already knew what they'd craft when they found them.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',1,'explorer',this)">
+        <span class="choice-emoji">✨</span><span class="choice-text">
+        <span class="choice-title">Gets excited and immediately shows everyone — this is a big moment</span>
+        <span class="choice-sub">Finding diamonds deserves a reaction. They react fully.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',2,'builder',this)">
+        <span class="choice-emoji">🔷</span><span class="choice-text">
+        <span class="choice-title">Saves them — diamonds are for decoration in the base, not tools</span>
+        <span class="choice-sub">Iron tools work fine. The diamonds are going in the floor design.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',3,'fighter',this)">
+        <span class="choice-emoji">⚔️</span><span class="choice-text">
+        <span class="choice-title">Sword first, then armor — they want to go fight something immediately</span>
+        <span class="choice-sub">The whole point of being powerful is using it.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',4,'hoarder',this)">
+        <span class="choice-emoji">🔒</span><span class="choice-text">
+        <span class="choice-title">Puts them in a chest and doesn't touch them — too valuable to use</span>
+        <span class="choice-sub">What if they find a better use later? They're staying right there.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q2',5,'helper',this)">
+        <span class="choice-emoji">🎁</span><span class="choice-text">
+        <span class="choice-title">Splits them with the group — everyone should have good gear</span>
+        <span class="choice-sub">What's the point of having the best stuff if your friends are dying?</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(2)">← Back</button>
+      <button class="btn btn-primary" id="next-2" onclick="nextCard(2)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="question-card" id="card-3">
+    <div class="section-label">Question 3 of 7</div>
+    <span class="question-emoji">💀</span>
+    <p class="question-text">Your character dies and loses everything. How do they react?</p>
+    <div class="choices" id="q3">
+      <button class="choice-btn" onclick="selectChoice('q3',0,'planner',this)">
+        <span class="choice-emoji">😤</span><span class="choice-text">
+        <span class="choice-title">Frustrated — but already making a checklist of what to rebuild first</span>
+        <span class="choice-sub">Setbacks happen. The response is what matters. Back to work.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',1,'explorer',this)">
+        <span class="choice-emoji">😂</span><span class="choice-text">
+        <span class="choice-title">Laughs about it — that was honestly kind of impressive</span>
+        <span class="choice-sub">Dying in a spectacular way is almost worth it. Almost.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',2,'builder',this)">
+        <span class="choice-emoji">😔</span><span class="choice-text">
+        <span class="choice-title">Gutted — they lost materials they needed for the build</span>
+        <span class="choice-sub">The tools they can replace. The rare blocks they had? Gone.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',3,'fighter',this)">
+        <span class="choice-emoji">😠</span><span class="choice-text">
+        <span class="choice-title">Goes back immediately to get revenge on whatever killed them</span>
+        <span class="choice-sub">That mob is getting it. Right now. With fists if necessary.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',4,'hoarder',this)">
+        <span class="choice-emoji">😭</span><span class="choice-text">
+        <span class="choice-title">Devastated — they had so much stuff accumulated and now it's gone</span>
+        <span class="choice-sub">Years of collecting. Gone in seconds. This is genuinely upsetting.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q3',5,'helper',this)">
+        <span class="choice-emoji">🙏</span><span class="choice-text">
+        <span class="choice-title">Asks the group if anyone can spare some starter supplies</span>
+        <span class="choice-sub">They'd do the same for anyone else. It's okay to ask.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(3)">← Back</button>
+      <button class="btn btn-primary" id="next-3" onclick="nextCard(3)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="question-card" id="card-4">
+    <div class="section-label">Question 4 of 7</div>
+    <span class="question-emoji">🏠</span>
+    <p class="question-text">What does your character's base actually look like?</p>
+    <div class="choices" id="q4">
+      <button class="choice-btn" onclick="selectChoice('q4',0,'planner',this)">
+        <span class="choice-emoji">📦</span><span class="choice-text">
+        <span class="choice-title">Organized and functional — labeled chests, efficient layout, everything has a place</span>
+        <span class="choice-sub">It's not fancy but you can find anything in under ten seconds.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',1,'explorer',this)">
+        <span class="choice-emoji">🏚️</span><span class="choice-text">
+        <span class="choice-title">A dirt hut they never upgraded because they're always somewhere else</span>
+        <span class="choice-sub">Home is wherever they last placed a bed. Usually far away.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',2,'builder',this)">
+        <span class="choice-emoji">🏰</span><span class="choice-text">
+        <span class="choice-title">Genuinely impressive — took way longer than survival required but worth it</span>
+        <span class="choice-sub">Every block was chosen on purpose. It has windows. And a garden.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',3,'fighter',this)">
+        <span class="choice-emoji">⚔️</span><span class="choice-text">
+        <span class="choice-title">A mob farm and a weapons room — built for utility, not comfort</span>
+        <span class="choice-sub">The base exists to support the fighting. That's all it needs to do.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',4,'hoarder',this)">
+        <span class="choice-emoji">📚</span><span class="choice-text">
+        <span class="choice-title">Wall-to-wall chests full of things they definitely need someday</span>
+        <span class="choice-sub">There's a system. Only they understand it. That's fine.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q4',5,'helper',this)">
+        <span class="choice-emoji">🏘️</span><span class="choice-text">
+        <span class="choice-title">A shared community base with farms, beds for everyone, and communal storage</span>
+        <span class="choice-sub">Why build one base when you can build something everyone uses?</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(4)">← Back</button>
+      <button class="btn btn-primary" id="next-4" onclick="nextCard(4)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="question-card" id="card-5">
+    <div class="section-label">Question 5 of 7</div>
+    <span class="question-emoji">🌙</span>
+    <p class="question-text">A creeper blows up part of your character's base. What do they do?</p>
+    <div class="choices" id="q5">
+      <button class="choice-btn" onclick="selectChoice('q5',0,'planner',this)">
+        <span class="choice-emoji">🔧</span><span class="choice-text">
+        <span class="choice-title">Repairs it immediately and adds walls to make sure it doesn't happen again</span>
+        <span class="choice-sub">Problem identified. Solution implemented. Moving on.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',1,'explorer',this)">
+        <span class="choice-emoji">🤷</span><span class="choice-text">
+        <span class="choice-title">Leaves it — honestly the hole gives the base more character</span>
+        <span class="choice-sub">It's a battle scar. They kind of like it.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',2,'builder',this)">
+        <span class="choice-emoji">😡</span><span class="choice-text">
+        <span class="choice-title">Furious — not about survival, but because it ruined the aesthetic</span>
+        <span class="choice-sub">That wall took forever to get right. The creeper will pay for this.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',3,'fighter',this)">
+        <span class="choice-emoji">💥</span><span class="choice-text">
+        <span class="choice-title">Chases every creeper in the area and eliminates them</span>
+        <span class="choice-sub">This is now a war. They started it.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',4,'hoarder',this)">
+        <span class="choice-emoji">😰</span><span class="choice-text">
+        <span class="choice-title">Frantically checks if any of their chests survived</span>
+        <span class="choice-sub">The base can be rebuilt. The stuff in those chests cannot.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q5',5,'helper',this)">
+        <span class="choice-emoji">👷</span><span class="choice-text">
+        <span class="choice-title">Asks the group to help rebuild — makes it a team project</span>
+        <span class="choice-sub">They'd help anyone else rebuild. No reason to do it alone.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(5)">← Back</button>
+      <button class="btn btn-primary" id="next-5" onclick="nextCard(5)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="question-card" id="card-6">
+    <div class="section-label">Question 6 of 7</div>
+    <span class="question-emoji">🔥</span>
+    <p class="question-text">Someone in the group is struggling and about to quit. What does your character do?</p>
+    <div class="choices" id="q6">
+      <button class="choice-btn" onclick="selectChoice('q6',0,'planner',this)">
+        <span class="choice-emoji">📝</span><span class="choice-text">
+        <span class="choice-title">Gives them a clear step-by-step plan for getting back on their feet</span>
+        <span class="choice-sub">The problem has a solution. Let's walk through it together.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',1,'explorer',this)">
+        <span class="choice-emoji">🗺️</span><span class="choice-text">
+        <span class="choice-title">Takes them on an adventure to find something cool — changes the mood</span>
+        <span class="choice-sub">Sometimes you just need to see something amazing to remember why you're playing.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',2,'builder',this)">
+        <span class="choice-emoji">🎨</span><span class="choice-text">
+        <span class="choice-title">Invites them to work on the build together — gives them a role in something bigger</span>
+        <span class="choice-sub">Being part of creating something great is motivating. Come help.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',3,'fighter',this)">
+        <span class="choice-emoji">💪</span><span class="choice-text">
+        <span class="choice-title">Takes them on a boss fight — nothing builds confidence like winning something hard</span>
+        <span class="choice-sub">The best way out of a slump is through a challenge.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',4,'hoarder',this)">
+        <span class="choice-emoji">🎒</span><span class="choice-text">
+        <span class="choice-title">Digs through their chests and gives them supplies — they have extra of everything</span>
+        <span class="choice-sub">This is exactly why they kept all this stuff. Moment arrived.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q6',5,'helper',this)">
+        <span class="choice-emoji">🫶</span><span class="choice-text">
+        <span class="choice-title">Drops everything they're doing and spends the whole session helping them</span>
+        <span class="choice-sub">Their progress can wait. This person needs support right now.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(6)">← Back</button>
+      <button class="btn btn-primary" id="next-6" onclick="nextCard(6)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="question-card" id="card-7">
+    <div class="section-label">Question 7 of 7</div>
+    <span class="question-emoji">🌟</span>
+    <p class="question-text">Last one. What would your character's Minecraft sign say outside their base?</p>
+    <div class="choices" id="q7">
+      <button class="choice-btn" onclick="selectChoice('q7',0,'planner',this)">
+        <span class="choice-emoji">📋</span><span class="choice-text">
+        <span class="choice-title">"Storage Room: Chest 1-12. Smelting: Left. Crafting: Right. No touching."</span>
+        <span class="choice-sub">The system works. Please respect the system.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',1,'explorer',this)">
+        <span class="choice-emoji">🗺️</span><span class="choice-text">
+        <span class="choice-title">"Probably not home. Check the coordinates I left — I'm at that mesa biome."</span>
+        <span class="choice-sub">They're always somewhere else. Leave a message.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',2,'builder',this)">
+        <span class="choice-emoji">🏰</span><span class="choice-text">
+        <span class="choice-title">"Still under construction. Do not judge the exterior. Check back in three weeks."</span>
+        <span class="choice-sub">The vision isn't finished yet. Patience.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',3,'fighter',this)">
+        <span class="choice-emoji">💀</span><span class="choice-text">
+        <span class="choice-title">"Wither defeated: Day 3. Dragon: Day 7. What's next?"</span>
+        <span class="choice-sub">The scoreboard is public. They're proud of it.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',4,'hoarder',this)">
+        <span class="choice-emoji">🔒</span><span class="choice-text">
+        <span class="choice-title">"Do NOT open any chests. I know exactly what's in every single one."</span>
+        <span class="choice-sub">The system is in their head. It works. Do not disturb it.</span></span>
+      </button>
+      <button class="choice-btn" onclick="selectChoice('q7',5,'helper',this)">
+        <span class="choice-emoji">🏘️</span><span class="choice-text">
+        <span class="choice-title">"Community farm: free for everyone. Take what you need. Replant what you take."</span>
+        <span class="choice-sub">The whole point is that everyone benefits. That's the sign.</span></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="prevCard(7)">← Back</button>
+      <span></span>
+    </div>
+    <button class="btn btn-submit" onclick="generateResult()">⛏ Reveal Your Strategy →</button>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-section">
+    <div class="result-card" id="result-card">
+      <p class="result-eyebrow" id="res-student-label"></p>
+      <span class="result-emoji" id="res-emoji"></span>
+      <h2 class="result-type" id="res-type"></h2>
+      <p class="result-subtitle" id="res-subtitle"></p>
+      <div class="result-divider" id="res-divider"></div>
+      <div class="result-real-life" id="res-real-life">
+        <strong>🌍 In Real Life, This Means...</strong>
+        <p id="res-real-life-text"></p>
+      </div>
+      <p class="result-summary" id="res-summary"></p>
+      <div class="result-reflection" id="res-reflection">
+        <strong>✍ Writing Tip</strong>
+        <span id="res-writing-tip"></span>
+      </div>
+      <button class="btn-retake" onclick="retake()">↩ New World</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── PROFANITY FILTER ────────────────────────────────────────────────────────
+const wholeWordOnly = ['damn','dammit','hell','crap','dick','homo','jerk','piss','sex','cum','fag','hoe','spic','rape','porn','tits','cock'];
+const substringMatch = ['ass','asses','asshole','assholes','bastard','bitch','bitches','bullshit','cunt','cunts','dickhead','douche','douchebag','faggot','faggots','fuck','fucked','fucker','fuckers','fucking','fucks','jackass','motherfucker','motherfuckers','nigga','nigger','niggers','pissed','prick','pricks','pussy','pussies','retard','retarded','shit','shits','shitty','skank','slut','sluts','twat','twats','whore','whores','wtf','ballsack','blowjob','boner','butthole','chink','clit','clits','cocks','dildo','dyke','erection','handjob','jizz','kike','lesbo','molest','orgasm','penis','pervert','porno','prostitute','rapist','screwing','shag','spank','testicle','tranny','vagina','wank','wanker','fuckface','dipshit','numbnuts','scrotum','shitheads','suckmy','jackoff','jackoffs'];
+
+function containsBadWord(input) {
+  const cleaned = input.toLowerCase().replace(/[^a-z]/g, ' ').trim();
+  const words = cleaned.split(/\s+/);
+  if (words.some(w => wholeWordOnly.includes(w))) return true;
+  if (substringMatch.some(bad => cleaned.replace(/\s/g,'').includes(bad) || cleaned.includes(bad))) return true;
+  return false;
+}
+function showWarning(inputEl) {
+  const existing = inputEl.parentNode.querySelector('.filter-warning');
+  if (existing) existing.remove();
+  inputEl.style.borderColor = '#ef5350';
+  inputEl.value = '';
+  const warning = document.createElement('p');
+  warning.className = 'filter-warning';
+  warning.style.cssText = 'margin-top:8px;font-size:14px;font-weight:700;color:#ef5350;font-family:"Nunito",sans-serif;';
+  warning.textContent = '⛏ Make better choices! — Mrs. Brown';
+  inputEl.parentNode.appendChild(warning);
+  setTimeout(() => { warning.remove(); inputEl.style.borderColor = 'var(--border)'; }, 3500);
+}
+function checkNameInputs() {
+  const s = document.getElementById('student-name');
+  const c = document.getElementById('char-name');
+  let clean = true;
+  if (containsBadWord(s.value)) { showWarning(s); clean = false; }
+  if (containsBadWord(c.value)) { showWarning(c); clean = false; }
+  return clean;
+}
+
+// ─── SHUFFLE ONCE ON CARD 0 EXIT ─────────────────────────────────────────────
+function shuffleAllChoicesOnce() {
+  document.querySelectorAll('.choices').forEach(container => {
+    const btns = Array.from(container.querySelectorAll('.choice-btn'));
+    for (let i = btns.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [btns[i], btns[j]] = [btns[j], btns[i]];
+    }
+    btns.forEach(b => container.appendChild(b));
+  });
+}
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+const TOTAL_CARDS = 7;
+const answers = {};
+
+// ─── NAVIGATION ──────────────────────────────────────────────────────────────
+function showCard(n) {
+  document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
+  document.getElementById('card-' + n).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.querySelector('.progress-bar-wrap').style.display = n === 0 ? 'none' : 'block';
+  updateProgress(n);
+}
+
+function nextCard(current) {
+  if (current === 0) {
+    const sn = document.getElementById('student-name').value.trim();
+    const cn = document.getElementById('char-name').value.trim();
+    if (!sn || !cn) { alert('Please fill in both names before continuing.'); return; }
+    if (!checkNameInputs()) return;
+    shuffleAllChoicesOnce();
+  }
+  showCard(current + 1);
+}
+
+function prevCard(current) { showCard(current - 1); }
+
+function updateProgress(cardIndex) {
+  const pct = cardIndex === 0 ? 0 : Math.round((cardIndex / TOTAL_CARDS) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = cardIndex === 0 ? '' : pct + '%';
+  document.getElementById('progress-label').textContent = cardIndex === 0 ? '' : 'Question ' + cardIndex + ' of ' + TOTAL_CARDS;
+}
+
+// ─── CHOICE SELECTION ─────────────────────────────────────────────────────────
+function selectChoice(qId, idx, type, btn) {
+  const container = document.getElementById(qId);
+  container.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  answers[qId] = { type };
+  const nextBtn = document.getElementById('next-' + parseInt(qId.replace('q', '')));
+  if (nextBtn) nextBtn.disabled = false;
+}
+
+// ─── SCORING ─────────────────────────────────────────────────────────────────
+function getDominantType() {
+  const scores = { planner: 0, explorer: 0, builder: 0, fighter: 0, hoarder: 0, helper: 0 };
+  Object.values(answers).forEach(a => { if (a && a.type) scores[a.type]++; });
+  return Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0];
+}
+
+// ─── RESULT PROFILES ─────────────────────────────────────────────────────────
+const profiles = {
+  planner: {
+    emoji: '📋',
+    type: 'THE PLANNER',
+    subtitle: 'Prepared for everything. Panics about nothing.',
+    cardClass: 'mc-planner',
+    realLife: 'This character thinks before they act, has a backup plan, and gets frustrated when other people are unprepared. In a group project they\'re the one making the outline. In a friendship they\'re the one who actually remembers what time the thing starts.',
+    summary: (name) => `${name} is the player who has a chest labeled "Emergency Food" before they have a bed. They play Minecraft the way they move through the world — with intention, preparation, and a low tolerance for wasted effort. The Planner isn't rigid for no reason; they've just learned that thinking ahead prevents the kind of disasters that derail everyone. In survival mode, this looks like labeled storage and pre-dug escape tunnels. In real life, it looks like a character who sees problems coming before anyone else does and quietly handles them. Their weakness is that not everything can be planned for, and when something genuinely unexpected happens, the absence of a checklist can shake them more than it should. Their story gets interesting when the plan falls apart completely and they have to improvise.`,
+    tip: 'Write your character in a situation where preparation fails and they have to react without a plan. The gap between who they are with a strategy and who they are without one is where the real character lives.'
+  },
+  explorer: {
+    emoji: '🏃',
+    type: 'THE EXPLORER',
+    subtitle: 'Always somewhere else. Always finding something worth it.',
+    cardClass: 'mc-explorer',
+    realLife: 'This character follows curiosity without apology. They get distracted by interesting things, forget what they were supposed to be doing, and somehow end up in the most memorable situations. In a group project they have seventeen ideas. In a friendship they\'re the one who says "we should go" and actually means it.',
+    summary: (name) => `${name} dies with no bed set at least once a session and genuinely doesn\'t regret it because they found a coral reef or a jungle temple and it was absolutely worth it. The Explorer plays Minecraft with the same philosophy they bring to everything — experience first, consequences second, regrets never. They\'re not reckless; they just have a different risk calculation than everyone else, one where missing something interesting costs more than losing your inventory. In real life this is the character who proposes things, tries things, and drags everyone into situations that become stories. Their weakness is follow-through: amazing ideas, scattered execution. Their story gets interesting when they find something that actually makes them want to stay.`,
+    tip: 'Write your character choosing to stay somewhere instead of moving on — and show what it costs them to make that choice. The Explorer deciding to commit is one of the most revealing moments you can write.'
+  },
+  builder: {
+    emoji: '🏰',
+    type: 'THE BUILDER',
+    subtitle: 'Survival is just logistics. The real work is the vision.',
+    cardClass: 'mc-builder',
+    realLife: 'This character sees the finished version of things before anyone else does. They care deeply about how things look and feel, get frustrated when execution doesn\'t match the vision, and often lose track of time when working on something they care about. In a group project they\'re the one who stays up fixing the presentation at midnight.',
+    summary: (name) => `${name} treats survival mode as a resource-gathering phase for their actual project. The whole point of finding diamonds is not getting better gear — it\'s that diamond blocks make a very specific pattern in the floor of the central hall they\'ve been planning since day one. The Builder has a vision and that vision drives everything. In real life this is the character who cares more about doing something right than doing it fast, who gets genuinely emotional when something they worked hard on gets ruined, and who sees potential in things that look like nothing to everyone else. Their weakness is that the vision can become more important than the people around them. Their story gets interesting when someone else\'s need forces them to stop building and actually show up.`,
+    tip: 'Write your character abandoning something they were building — not because they finished, but because someone needed them. Show us what that costs them and what it gives them instead.'
+  },
+  fighter: {
+    emoji: '⚔️',
+    type: 'THE FIGHTER',
+    subtitle: 'Finds the danger on purpose. Comes back with loot.',
+    cardClass: 'mc-fighter',
+    realLife: 'This character moves toward challenge instead of away from it. They get bored when things are safe and easy, come alive when something is actually difficult, and have a competitive streak they don\'t always bother hiding. In a group project they want the hardest part. In a conflict they don\'t avoid it — they walk right into it.',
+    summary: (name) => `${name} finds the nearest cave on night one and walks in without a torch. The Fighter doesn\'t play Minecraft to feel safe — they play to test themselves, and the harder the test the better. This is a character who has more fun losing a difficult fight than winning an easy one, because the point was never just winning. In real life this is the character who volunteers for the hardest thing in the room, who gets restless when there\'s no challenge available, and who sometimes picks conflict not out of cruelty but out of a genuine need to know how hard something is. Their weakness is that the need for challenge can look like aggression, and not everyone reads it the same way. Their story gets interesting when they meet something they can\'t fight their way through.`,
+    tip: 'Write your character facing a problem that can\'t be solved with force or confrontation — a situation that requires patience, gentleness, or vulnerability instead. Watch what happens when the tools they rely on don\'t work.'
+  },
+  hoarder: {
+    emoji: '📦',
+    type: 'THE HOARDER',
+    subtitle: 'Keeps everything. Just in case. Especially that.',
+    cardClass: 'mc-hoarder',
+    realLife: 'This character holds on to things — objects, memories, grudges, connections — because letting go feels like losing something that might matter later. They\'re loyal, sentimental, and genuinely prepared for scenarios nobody else thought to prepare for. In a friendship they remember details. In a crisis they have exactly what\'s needed because they never threw it away.',
+    summary: (name) => `${name} has forty-seven pieces of gravel in their inventory and a very good reason for all of them. The Hoarder\'s base is less a home and more a museum of every interesting thing they\'ve ever found, and the organizational system makes perfect sense — to them. In real life this is the character who keeps every note anyone ever wrote them, who remembers what someone said three years ago, who struggles to let go of things because everything feels like it might be important eventually. Their strength is that they\'re never caught off guard — they have the thing, they kept the thing, the thing is in chest seven on the left. Their weakness is that the fear of losing things can start to shape every decision. Their story gets interesting when they have to give something away and choose to do it anyway.`,
+    tip: 'Write your character voluntarily giving something away that they\'ve been holding onto — and make it mean something. What they choose to release tells us everything about who they\'re becoming.'
+  },
+  helper: {
+    emoji: '🌾',
+    type: 'THE HELPER',
+    subtitle: 'Built a farm for the whole server. You\'re welcome.',
+    cardClass: 'mc-helper',
+    realLife: 'This character finds meaning in other people\'s success. They share resources naturally, notice when someone is struggling before that person asks for help, and feel genuinely good when the group does well. In a friendship they\'re the one who checks in. In a crisis they\'re the first one there.',
+    summary: (name) => `${name} built a community wheat farm on day three and left a sign that says "take what you need, replant what you take." The Helper\'s Minecraft world is organized around a simple principle: everyone should have what they need, and if ${name} can make that happen, they will. This isn\'t performed generosity — it\'s just how they think. In real life this is the character who gives without keeping score, who notices when someone goes quiet in a group, who is quietly essential to every team they\'re part of. Their weakness is the same thing that makes them powerful: they\'re so good at caring for others that their own needs can go unvoiced and unmet. Their story gets most interesting when someone finally turns the care back toward them and they have to figure out how to receive it.`,
+    tip: 'Write a scene where your character needs something and has to actually ask for it — not hint at it, not handle it alone, but genuinely ask. That moment of vulnerability is where the Helper\'s real story begins.'
+  }
+};
+
+// ─── GENERATE RESULT ─────────────────────────────────────────────────────────
+function generateResult() {
+  const type = getDominantType();
+  const profile = profiles[type];
+  const charName = document.getElementById('char-name').value.trim() || 'Your character';
+  const studentName = document.getElementById('student-name').value.trim();
+
+  document.getElementById('res-student-label').textContent = studentName ? `${studentName}'s character` : 'Character Profile';
+  document.getElementById('res-emoji').textContent = profile.emoji;
+  document.getElementById('res-type').textContent = profile.type;
+  document.getElementById('res-subtitle').textContent = profile.subtitle;
+  document.getElementById('res-real-life-text').textContent = profile.realLife;
+  document.getElementById('res-summary').textContent = profile.summary(charName);
+  document.getElementById('res-writing-tip').textContent = profile.tip;
+
+  const card = document.getElementById('result-card');
+  card.className = 'result-card ' + profile.cardClass;
+
+  document.querySelector('.progress-bar-wrap').style.display = 'block';
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('progress-pct').textContent = '100%';
+  document.getElementById('progress-label').textContent = 'Strategy Revealed ⛏';
+
+  setTimeout(() => {
+    document.querySelectorAll('.question-card').forEach(c => c.style.display = 'none');
+    document.querySelector('.progress-bar-wrap').style.display = 'none';
+    document.getElementById('result-section').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 700);
+}
+
+function retake() { window.location.reload(); }
+</script>
+</body>
+</html>
