@@ -577,16 +577,16 @@
     <div class="section-label">Section 1 · Multiple Choice</div>
     <p class="question-text">Your character just found out someone close to them has been keeping a major secret. What's their first reaction?</p>
     <div class="choices" id="q1">
-      <button class="choice-btn" onclick="selectChoice('q1',0,'leader')" data-type="leader">
+      <button class="choice-btn" onclick="selectChoice('q1',0,'leader',this)" data-type="leader">
         <span class="choice-letter">A</span> Confront them immediately — they need answers right now.
       </button>
-      <button class="choice-btn" onclick="selectChoice('q1',1,'loner')" data-type="loner">
+      <button class="choice-btn" onclick="selectChoice('q1',1,'loner',this)" data-type="loner">
         <span class="choice-letter">B</span> Pull away and process it alone before saying a word.
       </button>
-      <button class="choice-btn" onclick="selectChoice('q1',2,'empath')" data-type="empath">
+      <button class="choice-btn" onclick="selectChoice('q1',2,'empath',this)" data-type="empath">
         <span class="choice-letter">C</span> Try to understand the other person's reasons before reacting.
       </button>
-      <button class="choice-btn" onclick="selectChoice('q1',3,'strategist')" data-type="strategist">
+      <button class="choice-btn" onclick="selectChoice('q1',3,'strategist',this)" data-type="strategist">
         <span class="choice-letter">D</span> Make a plan. Figure out how this changes everything.
       </button>
     </div>
@@ -601,16 +601,16 @@
     <div class="section-label">Section 1 · Multiple Choice</div>
     <p class="question-text">When everything goes wrong at once, your character tends to…</p>
     <div class="choices" id="q2">
-      <button class="choice-btn" onclick="selectChoice('q2',0,'leader')" data-type="leader">
+      <button class="choice-btn" onclick="selectChoice('q2',0,'leader',this)" data-type="leader">
         <span class="choice-letter">A</span> Take charge and start fixing things immediately.
       </button>
-      <button class="choice-btn" onclick="selectChoice('q2',1,'loner')" data-type="loner">
+      <button class="choice-btn" onclick="selectChoice('q2',1,'loner',this)" data-type="loner">
         <span class="choice-letter">B</span> Shut down or go quiet until the storm passes.
       </button>
-      <button class="choice-btn" onclick="selectChoice('q2',2,'empath')" data-type="empath">
+      <button class="choice-btn" onclick="selectChoice('q2',2,'empath',this)" data-type="empath">
         <span class="choice-letter">C</span> Lean on someone they trust for support.
       </button>
-      <button class="choice-btn" onclick="selectChoice('q2',3,'strategist')" data-type="strategist">
+      <button class="choice-btn" onclick="selectChoice('q2',3,'strategist',this)" data-type="strategist">
         <span class="choice-letter">D</span> Channel it into something — anger, humor, creativity.
       </button>
     </div>
@@ -625,16 +625,16 @@
     <div class="section-label">Section 1 · Multiple Choice</div>
     <p class="question-text">What does your character want most, even if they never say it out loud?</p>
     <div class="choices" id="q3">
-      <button class="choice-btn" onclick="selectChoice('q3',0,'leader')" data-type="leader">
+      <button class="choice-btn" onclick="selectChoice('q3',0,'leader',this)" data-type="leader">
         <span class="choice-letter">A</span> To be respected and taken seriously.
       </button>
-      <button class="choice-btn" onclick="selectChoice('q3',1,'loner')" data-type="loner">
+      <button class="choice-btn" onclick="selectChoice('q3',1,'loner',this)" data-type="loner">
         <span class="choice-letter">B</span> To belong somewhere — or to someone.
       </button>
-      <button class="choice-btn" onclick="selectChoice('q3',2,'empath')" data-type="empath">
+      <button class="choice-btn" onclick="selectChoice('q3',2,'empath',this)" data-type="empath">
         <span class="choice-letter">C</span> To prove something to themselves.
       </button>
-      <button class="choice-btn" onclick="selectChoice('q3',3,'strategist')" data-type="strategist">
+      <button class="choice-btn" onclick="selectChoice('q3',3,'strategist',this)" data-type="strategist">
         <span class="choice-letter">D</span> To finally feel safe.
       </button>
     </div>
@@ -649,10 +649,10 @@
     <div class="section-label">Section 2 · This or That</div>
     <p class="question-text">Which fits your character better?</p>
     <div class="choices thisthat" id="q4">
-      <button class="choice-btn" onclick="selectChoice('q4',0,'leader')" data-type="leader">
+      <button class="choice-btn" onclick="selectChoice('q4',0,'leader',this)" data-type="leader">
         Speaks before they think
       </button>
-      <button class="choice-btn" onclick="selectChoice('q4',1,'strategist')" data-type="strategist">
+      <button class="choice-btn" onclick="selectChoice('q4',1,'strategist',this)" data-type="strategist">
         Thinks before they speak
       </button>
     </div>
@@ -667,10 +667,10 @@
     <div class="section-label">Section 2 · This or That</div>
     <p class="question-text">Which fits your character better?</p>
     <div class="choices thisthat" id="q5">
-      <button class="choice-btn" onclick="selectChoice('q5',0,'empath')" data-type="empath">
+      <button class="choice-btn" onclick="selectChoice('q5',0,'empath',this)" data-type="empath">
         Forgives quickly, forgets slowly
       </button>
-      <button class="choice-btn" onclick="selectChoice('q5',1,'loner')" data-type="loner">
+      <button class="choice-btn" onclick="selectChoice('q5',1,'loner',this)" data-type="loner">
         Forgives slowly, never really forgets
       </button>
     </div>
@@ -685,10 +685,10 @@
     <div class="section-label">Section 2 · This or That</div>
     <p class="question-text">Which fits your character better?</p>
     <div class="choices thisthat" id="q6">
-      <button class="choice-btn" onclick="selectChoice('q6',0,'empath')" data-type="empath">
+      <button class="choice-btn" onclick="selectChoice('q6',0,'empath',this)" data-type="empath">
         Would rather be liked
       </button>
-      <button class="choice-btn" onclick="selectChoice('q6',1,'strategist')" data-type="strategist">
+      <button class="choice-btn" onclick="selectChoice('q6',1,'strategist',this)" data-type="strategist">
         Would rather be feared
       </button>
     </div>
@@ -903,6 +903,7 @@ function nextCard(current) {
     const cn = document.getElementById('char-name').value.trim();
     if (!sn || !cn) { alert('Please fill in both names before continuing.'); return; }
     if (!checkNameInputs()) return;
+    shuffleAllChoicesOnce();
   }
   showCard(current + 1);
 }
@@ -921,14 +922,17 @@ function updateProgress(cardIndex) {
 }
 
 // ─── MULTIPLE CHOICE & THIS/THAT ─────────────────────────────────────────────
-function selectChoice(qId, idx, type) {
+function selectChoice(qId, idx, type, btn) {
   const container = document.getElementById(qId);
-  container.querySelectorAll('.choice-btn').forEach((btn, i) => {
-    btn.classList.toggle('selected', i === idx);
-    const letter = btn.querySelector('.choice-letter');
-    if (letter) letter.style.background = i === idx ? 'var(--accent)' : '';
+  container.querySelectorAll('.choice-btn').forEach(b => {
+    b.classList.remove('selected');
+    const letter = b.querySelector('.choice-letter');
+    if (letter) letter.style.background = '';
   });
-  answers[qId] = { idx, type };
+  btn.classList.add('selected');
+  const letter = btn.querySelector('.choice-letter');
+  if (letter) letter.style.background = 'var(--accent)';
+  answers[qId] = { type };
   const cardNum = parseInt(qId.replace('q', ''));
   const nextBtn = document.getElementById('next-' + cardNum);
   if (nextBtn) nextBtn.disabled = false;
@@ -1105,6 +1109,20 @@ function generateResult() {
 
 // ─── RETAKE ───────────────────────────────────────────────────────────────────
 function retake() { window.location.reload(); }
+
+// ─── SHUFFLE ANSWERS ONCE ON QUIZ START ──────────────────────────────────────
+function shuffleAllChoicesOnce() {
+  document.querySelectorAll('.choices').forEach(container => {
+    if (container.classList.contains('thisthat')) return;
+    const btns = Array.from(container.querySelectorAll('.choice-btn'));
+    for (let i = btns.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [btns[i], btns[j]] = [btns[j], btns[i]];
+    }
+    btns.forEach(b => container.appendChild(b));
+  });
+}
+
 </script>
 </body>
 </html>
